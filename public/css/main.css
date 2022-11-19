@@ -1,0 +1,88 @@
+*@import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+/* @import instead of link*/
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+      
+  }
+  
+  
+  html,body {
+    background-color: #fff;
+    font-family: 'Space Mono', monospace;
+    font-family: 'Open Sans', sans-serif;
+    min-height:100%;
+    margin: auto;
+    overflow-x: hidden;
+  }
+
+main {
+    /*Hint: với footer có height:200px; main after có height: 200px; thử thay min-height: 100%; thành height:200px;*/
+    min-height: 100%; /*không cố định px nào hết mà must contain everything else on your main*/
+    margin-bottom: -200px;  /*bằng height của footer*/
+    background: #ddd; /*xám*/
+    overflow-x: hidden;
+    /*Note: w3school cho cặp sau ở main chứ không ở body , nếu ở body là làm các element có scroll */
+    /*https://www.w3schools.com/css/css_overflow.asp*/
+    /*Cách solution thay vì overflow-x: làm chữ Thông tin covid nhỏ lại sẽ không overflow theo chiều x thì thanh slidee tự biến mất*/
+    
+     /* overflow-y: scroll; sẽ làm có vị trí một thanh cuộn, cách solution là dùng min-height:100%*/
+}
+
+main:after {
+    content: "";
+    display: block;
+    height: 200px;
+}
+
+h1{
+    color:chocolate;
+    background-color:yellow;
+    margin-top:0px;
+    margin-bottom:20px
+}
+
+/*this "footer chunk* được tách khỏi /css/footer.css vì làm rõ mối quan hệ với main section's css*/
+/*https://stackoverflow.com/questions/16555308/vertically-aligning-footer-content*/
+footer {
+    /*height: 200px;*/  /*note: fixed height thì khi chiều cao kéo dài ra ở mobile iphone 4, thì nền đen sẽ không phủ hết các chữ của footer*/
+    /* min-height: 100%; */  /* Trong inlineCSS có ghi min-height:auto sẽ chiếm ưu thế hơn External tốt nhất là min-height sẽ phủ toàn nội dung bên trong cho dù trong iphone 4 screens*/
+    /*Nếu đồng thời tồn tại height: 200px; và min-height: 100%; thì cái thứ nhất được ưu tiên hơn*/
+    /*If your site isn't a responsive site, you just need to add a width like so: #footer {width:500px;}*/
+}
+/*giải thích ý nghĩa của main, main:after and footer 👉 https://stackoverflow.com/questions/19192211/css-how-to-style-a-footer*/
+
+nav.navbar-inverse{
+    /*technique: dấu . sát nav, !important giúp ưu thế hơn bootstrap css*/
+    margin-bottom:0px !important;
+}
+
+.nav>li>a, .nav>li>form {
+    position: relative;
+    display: block;
+    padding: 10px 15px;
+}
+
+#nuakhuvucHinh {
+    /*path tuyệt đối nghĩa là gắn với computer address http://localhost:3002*/
+    /*🤜 A relative URL - points to a file within a web site (like src="image.gif")*/
+    /*https://www.w3schools.com/tags/att_img_src.asp 🤜 Absolute URL - Links to an external image that is hosted on another website*/
+    /* background-image: url('/images/small-favicon.jpeg');  */
+    /*🧡 http://localhost:3002/images/small-favicon.jpeg*/
+    /*important note: url('../../covidImage.PNG') sẽ được gửi cho client với Type:"text/html" vì nó không được Express servers statically   */
+    background:url('/images/small-favicon.jpeg'); /*phải phóng to khu vực mới thấy hình*/
+    background-repeat: no-repeat;
+    
+    height:45rem;
+    width:28rem;
+}
+
+@media (min-width: 768px){
+    .navbar-nav>li>a, .navbar-nav>li>form {
+        padding-top: 15px;
+        padding-bottom: 15px;
+    }
+}

@@ -1,0 +1,22 @@
+    <link rel="stylesheet" href="/css/index.css">
+    <link rel="stylesheet" href="/css/login.css">
+    <link rel="stylesheet" href="/css/footer.css">
+    <link rel="stylesheet" href="/css/index.css">
+    <link rel="stylesheet" href="/css/normal_EJSmessage.css"> <!--http://localhost:3002//css/normal_EJSmessage.css--> <!--http://localhost:3002////css/normal_EJSmessage.css-->
+    <link rel="stylesheet" href="/css/nhanvienPersonalProfile.css">
+    <link rel="stylesheet" href="/css/dieu_huong.css">
+    <link rel="stylesheet" href="/css/qlcn_getEmpInfo.css">
+    <link rel="stylesheet" href="/css/w3css_flipping_card.css">
+    <!--animated background-->
+    <link rel="stylesheet" href="/css/differentRainDrop.css">
+    <!--có CSS làm mất thanh cuộn đứng LÝ DO là css này có chứa overflow:hidden-->
+
+    <!-- các đường dẫn absolute trên sẽ không mở được khi Ctrl+Click do nó static , được che đi path public, nhưng accessible qua trình duyệt-->
+    <!--sẽ không đọc được css nếu khai báo 2 thuộc tính class cùng lúc -->
+    <!--class="directMessage class="w3-panel w3-pale-green user-message user-message--error"-->
+</head>
+
+<body>
+    <%- include('./dieu_huong.ejs') %>   <!--hoặc chọn ../ejsDebug/comment_in_EJS.ejs-->
+    <%- include('./flash-message') %>
+    <main>

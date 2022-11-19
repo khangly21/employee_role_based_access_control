@@ -1,0 +1,22 @@
+<%- include('../views/layouts/khuc_dau.ejs') %>
+<%- include('../views/layouts/header.ejs') %> 
+        <div class="container">
+            <h1 style="background-color: rgb(222 234 77); color: rgb(255,255,0);" class="index_title">Employee Personal Covid19  information</h1>
+
+            <!--định dạng CSS thông điệp tương tự view register và login_mobile_w3css-->
+            <% if(message){%> 
+                <div class="directMessage w3-panel w3-pale-green user-message user-message--error">
+                        <%= message  %>
+                </div>
+            <%}%>
+
+            <div style="min-height:100%" class="index_main_section">
+                <p>Coming soon...</p>
+                <ul>
+
+                </ul>
+            </div>
+
+            <%- contactus  %>
+        </div>
+<%- include('../views/layouts/khuc_cuoi.ejs') %>

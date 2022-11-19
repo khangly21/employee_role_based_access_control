@@ -1,0 +1,85 @@
+<%- include('../views/layouts/khuc_dau.ejs') %>
+<%- include('../views/layouts/header.ejs') %>
+
+<div class="container">
+    <h1 style="background-color:rgb(255,240,199);color:rgb(255,255,0)">Register <%= welcome %></h1>
+
+    <!--cần style bảng div#directMessage, dùng link của link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" 👉 class="w3-panel w3-pale-green"-->
+    <% if (errorMessage) { %>
+        <!--không cần color, đã có trong NV chính-->
+        <div class=" directMessage w3-panel w3-pale-green user-message user-message--error"><%= errorMessage %></div>
+    <% } %>
+    <form  method="POST" action="/admin/register"  class="w3-container w3-card-4" novalidate> <!--dùng chung class="login-form" với Login thì xử lý hiển thị như nhau-->
+        <!--action=" thì Submit làm req mới bị mất phương hướng không biết tới đâu, làm spinning browser"-->
+        <div>
+            <!--thực tế là Email/Username và các sliding picture, hcapcha-->
+            <!--https://stackoverflow.com/questions/52871895/cant-set-values-on-process-env-in-client-side-javascript-->
+            <!--value=`${process.env.ADMIN_Ten_Dang_nhap}`  failed-->
+            <!--ghi thiếu = trong EJS tag là sai, vì không cho if vào, trừ trường hợp toán tử 3 ngôi cho if. Viết dòng này ra thì có ý tưởng cho if vào để các nhanvien.controller khỏi bắt buộc phải truyền biến này. Tốt nhất là ghi chú đừng đứng gần EJS dễ bị đọc lệch và báo lỗi-->
+            <!--so sánh fully-populated if-else với 3 ngôi, thấy 3 ngôi sẽ gán default value="/" còn if thì không-->
+            <label class="w3-text-blue" for="username">Username</label>
+            <input
+                class="w3-input w3-border"
+                type="text"
+                name="username" 
+                id="username"
+                <% if(bien_moi_truong_Nodejs1) { %>
+                    value= <%= bien_moi_truong_Nodejs1 %>
+                <% }else{ %>
+                    value=""
+                <% } %>
+                
+            />
+        </div>
+
+        <div>
+            <label class="w3-text-blue" for="password">Password</label>
+            <input 
+                class="w3-input w3-border"
+                type="password" 
+                name="password" 
+                id="password" 
+               
+                <% if(bien_moi_truong_Nodejs2) { %>
+                    value= <%= bien_moi_truong_Nodejs2 %>
+                <% }else{ %>
+                    value=""
+                <% } %>
+            />
+        </div>
+
+        <div>
+            <!--sẽ được validata bằng CUSTOM express-validator-->
+            <label class="w3-text-blue" for="confirmingPassword">Confirm password</label>
+            <input 
+                class="w3-input w3-border"
+                type="password" 
+                name="confirmingPassword" 
+                id="confirmingPassword" 
+                <% if(bien_moi_truong_Nodejs2) { %>
+                    value= <%= bien_moi_truong_Nodejs2 %>
+                <% }else{ %>
+                    value=""
+                <% } %>
+            />
+        </div>
+
+        <div>
+            <!-- <input type="submit" value="Register" /> -->
+            <button style="margin:1rem;" class="w3-btn w3-blue">Signup</button></p>
+        </div>
+    </form>
+
+    <% if(role) {  %>
+        <div style="text-align:center">
+            <p>
+                <!--<a href=" <%= `/${role}` %>/login">-->
+               Already have an account? <span><a href="<%= `/${role}` %>/login">Login 🌵</a></span>
+            </p>
+        </div>
+    <% } %>
+    
+
+    <br />
+</div>
+<%- include('../views/layouts/khuc_cuoi.ejs') %>

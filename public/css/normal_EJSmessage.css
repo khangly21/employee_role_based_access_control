@@ -1,0 +1,4 @@
+.directMessage{
+    font-weight: bold;
+    color: royalblue !important   /*important để đè lên màu đen của W3CSS framework*/
+}

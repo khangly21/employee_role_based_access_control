@@ -1,0 +1,11 @@
+<!-- 😎 <%=`/${role}`%>/register-->
+           
+            <!--Mistake1: <a href="<%=/`${role}`%>/register">-->
+            <!--Mistake2: <a href="<%`/${role}`%>/register">-->
+
+We use the raw output tag <%- with include
+
+thử comment on the ejs 
+   ** Invalid regular expression: missing /
+   <!--%/*  (Mistake1: <a href="<%=/`${role}`%>/register">)  */%-->
+   <!--%/*  (Mistake2: <a href="<%`/${role}`%>/register">)  */%-->

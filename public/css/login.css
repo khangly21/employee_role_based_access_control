@@ -1,0 +1,47 @@
+  
+  
+  form.login-form {
+    margin: 16px;
+    padding: 32px;
+    border: 4px solid #d1d5db;
+    min-width: 400px;
+    border-radius: 16px;
+  }
+  
+  .login-form label,
+  .login-form input {
+    display: block;
+    min-width: 100%;
+    margin: 8px 0px;
+  }
+  
+  .login-form label {
+    font-weight: bold;
+  }
+  
+  .login-form input {
+    height: 44px;
+    border: none;
+    border-radius: 8px;
+    padding: 8px;
+    font-size: 1rem;
+    background-color: #f3f4f6;
+  }
+  
+  .login-form input[type='submit'] {
+    margin: 16px 0;
+    background-color: #db2777;
+    color: #fff;
+    cursor: pointer;
+  }
+  
+  input:focus {
+    outline: none;
+    background-color: #fff;
+    border: 2px solid #f3f4f6;
+    /* box-shadow: 0 0 8px #fdf2f8; */
+  }
+
+  #if_you_have_registered_yet{
+    text-align: center;
+  }

@@ -1,0 +1,75 @@
+<%- include('../views/layouts/khuc_dau.ejs') %>
+<%- include('../views/layouts/header.ejs') %> 
+        <div class="container">
+            <h1 style="background-color: rgb(222 234 77); color: rgb(255,255,0);" class="index_title">Employee Check Out</h1>
+            <div style="min-height:100%" class="index_main_section">
+                <div style="text-align:center;" class="w3-container">
+                    
+                    <div class="w3-card-4" style="width:50%; margin-left:25%">
+                        <header class="w3-container w3-green">
+                          <h2>✍️Tạo phiếu check out✍️</h2>
+                        </header>
+                    
+                        <!--form đồng ý tạo Phiếu checkout-->
+                        <div class="w3-container" style="background-color:rgb(88,228,208)">
+                            <form action="/nhanvien/diemdanhra" method="POST">
+                                <!-- tạo doc của schema recordedKetThucLam-->
+                                <div> <!--lý do dùng div là để input không cùng hàng với button-->
+                                    <label for="hoten">Họ và tên</label>
+                                    <input name="hoten" id="hoten" value="<%= ten_nhan_vien  %> " readonly="readonly"/>
+                                </div>
+
+                                <div> 
+                                    <label for="manhanvien">Mã số nhân viên</label>
+                                    <input name="manhanvien" id="manhanvien" value="<%= nhan_vien.Ma_so  %> " readonly="readonly"/>
+                                </div>
+
+                                <!-- <div> 
+                                    <label for="soHlamtrongngay">Số giờ đã làm hôm nay</label>
+                                    <input name="soHlamtrongngay" id="soHlamtrongngay" value=""/>
+                                    <p>😊 We will check your working hours later!</p>
+                                </div> -->
+
+                                <div>
+                                    <label for="noilamviec">Noi_lam_viec</label>
+                                    <input name="noilamviec" id="noilamviec" value=""/>
+                                    <p>😊 We will check your working locations later!</p>
+                                </div>
+
+                                <div>
+                                     <label for="luotbatdau">Lượt bắt đầu</label>
+                                     <input name="luotbatdau" id="luotbatdau" value=""/>
+                                     <p>😊 Note: Viết theo dạng sau: 9/3/2022 , 15 : 5 : 54 PM</p> <!--khi check so trùng sẽ trim chuỗi để so sánh-->
+                                </div>
+
+                                <div>
+                                    <label for="luotketthuc">Lượt kết thúc</label>
+                                    <input name="luotketthuc"id="luotketthuc" value=""/>
+                                    <p>😊 Note: Viết theo dạng sau: 9/3/2022 , 15 : 5 : 54 PM</p>
+                                </div>
+
+                                <div>
+                                    <label for="thoigianphienlamviecTheoPhut">Thời gian phiên (phút)</label>
+                                    <input name="thoigianphienlamviecTheoPhut"id="thoigianphienlamviecTheoPhut" value=""/>
+                                    <p>😊 Note: 5 </p>
+                                </div>
+
+                                <!--gửi nguyên đối tượng nhanvien, lợi thứ nhất là Schema tự tách lấy nhanvienId -->
+                                <input type="hidden" name="nhanvienId" value="<%= nhan_vien._id%>"/> <!-- vì schema recordedKetThucLam cần userId-->
+                                
+                                <button type="submit" class="btn btn-secondary">Check me out!</button>
+                            </form>
+                        </div>
+                    
+                        <footer class="w3-container w3-green">
+                          <h5>SEE YOU AGAIN!</h5>
+                        </footer>
+                    </div>
+                </div>
+    
+            </div>
+            
+        </div>
+        
+        
+    <%- include('../views/layouts/khuc_cuoi.ejs') %>

@@ -1,0 +1,46 @@
+
+<%- include('../views/layouts/khuc_dau.ejs') %>
+<%- include('../views/layouts/header.ejs') %>
+    <div class="container">
+        <h1 style="background-color: rgb(222 234 77); color: rgb(255,255,0);" class="index_title">Employee CheckIn CheckOut</h1>
+
+        <!--định dạng CSS thông điệp tương tự view register và login_mobile_w3css-->
+        <% if(message){%> 
+            <div class="directMessage w3-panel w3-pale-green user-message user-message--error">
+                <%= message  %>
+            </div>
+        <%}%>
+
+        <div style="min-height:100%" class="index_main_section">
+            <div class="container">
+                <!-- vì sao col không chia đôi cột mà phải là col-sm-6 thì ok-->
+
+                <!--TỔNG KẾT TỪ BẢNG ketthuclams-->
+                <div class="row">
+                    <div class="col-sm-6">
+                        <b>Tổng số phút nhân viên làm trong ngày: </b> <span><%= sophutlamviectrongngay  %></span> <br>
+                        <b>-----------------------------------------------------</b><br>
+                        <%  if(mangLuotdiLuotve.length>0) { %>
+                            <% for (let LuotdiLuotve of mangLuotdiLuotve) { %>
+                              <b style="color:blue">Lượt bắt đầu:</b> <span><%= LuotdiLuotve.Luot_bat_dau  %></span> <br>
+                              <b class="w3-text-green">Lượt kết thúc:</b> <span><%= LuotdiLuotve.Luot_ket_thuc  %></span>  <br>
+                              <b>Nơi làm việc:</b> <span><%= LuotdiLuotve.Noi_lam_viec%></span>  <br>
+                              <b>-----------------------------------------------------</b><br>
+                            <% } %>
+                        <% }else{%>
+                            <h1>No Documentation Found!</h1>
+                        <% } %>
+                    </div>
+
+                    <!--https://stackoverflow.com/questions/34297770/how-can-i-set-background-image-to-row-column-in-bootstrap-->
+                    <!--header('Content-type: image/jpeg');//with header Content type -->
+                    <!--https://stackoverflow.com/questions/43675705/row-bootstrap-with-image-background-and-column-->
+                        <!--background-size: cover; /*That will make it responsive*/-->
+                    <div id="nuakhuvucHinh" class="col-sm-6"></div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+<%- include('../views/layouts/khuc_cuoi.ejs') %>

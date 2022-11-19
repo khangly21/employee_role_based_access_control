@@ -1,0 +1,94 @@
+<%- include('../views/layouts/khuc_dau.ejs') %>
+<%- include('../views/layouts/header.ejs') %> 
+        <div class="container">
+            <h1 style="background-color: rgb(222 234 77); color: rgb(255,255,0);" class="index_title">Covid details for individual employee</h1>
+
+            <!--định dạng CSS thông điệp tương tự view register và login_mobile_w3css-->
+            <% if(message){%> 
+                <div class="directMessage w3-panel w3-pale-green user-message user-message--error">
+                        <%= message  %>
+                </div>
+            <%}%>
+
+            <div style="min-height:100%" class="index_main_section">
+
+                <div class="row">
+                    <div class="col-sm-2">
+                        <div class="w3-card-4">
+                            <img src="https://ts.dntu.edu.vn/images/2020/200218_khuyen_cao_cua_Bo_Y_te_01.jpg" alt="Bộ y tế, 5K" style="width:100%">
+                            <div class="w3-container w3-center">
+                              <p>Bộ y tế, 5K</p>
+                            </div>
+                        </div>   
+                    </div>
+
+                    <div class="col-sm-10">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Tên nhân viên</th>
+                                    <th scope="col">Mã nhân viên</th>
+                                    <th scope="col">Mail nhân viên</th>
+                                    <th scope="col">Thân nhiệt</th>
+                                </tr>
+                            </thead>
+                            <tbody class="table-group-divider">
+                                <tr>
+                                    <th scope="row">1</th>
+                                    <td><%= tokhaiembednhanvien.nhanvienId.Ho_ten  %></td>
+                                    <td><%= tokhaiembednhanvien.nhanvienId.Ma_so  %></td>
+                                    <td><%= tokhaiembednhanvien.nhanvienId.Mail  %></td>
+                                    <td><%= tokhaiembednhanvien.Than_nhiet %></td>
+                                </tr>
+                            </tbody>
+                        </table> 
+
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Mũi 1</th>
+                                    <th scope="col">Mũi 2</th>
+                                    <th scope="col">Mũi 3</th>
+                                    <th scope="col">Mũi 4</th>
+                                </tr>
+                            </thead>
+                            <tbody class="table-group-divider">
+                                <tr>
+                                    <th scope="row">1</th>
+                                    <td><%= tokhaiembednhanvien.HangSX_mui_1  %> _ <%= tokhaiembednhanvien.Ngay_tiem_mui_1  %> </td>
+                                    <td><%= tokhaiembednhanvien.HangSX_mui_2  %> _ <%= tokhaiembednhanvien.Ngay_tiem_mui_2  %> </td>
+                                    <td><%= tokhaiembednhanvien.HangSX_mui_3 %> _ <%= tokhaiembednhanvien.Ngay_tiem_mui_3  %> </td>
+                                    <td><%= tokhaiembednhanvien.HangSX_mui_4 %> _ <%= tokhaiembednhanvien.Ngay_tiem_mui_4  %> </td>
+                                </tr>
+                            </tbody>
+                        </table> 
+
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Kết quả xét nghiệm</th>
+                                </tr>
+                            </thead>
+                            <tbody class="table-group-divider">
+                                <tr>
+                                    <th scope="row">1</th>
+                                    <%  if(tokhaiembednhanvien.Ket_qua_xet_nghiem === 'Dương tính') { %>
+                                        <td class="w3-text-red"><%= tokhaiembednhanvien.Ket_qua_xet_nghiem %> </td>
+                                    <% }else{   %>
+                                        <td class="w3-text-green"><%= tokhaiembednhanvien.Ket_qua_xet_nghiem %> </td>
+                                    <% }  %>
+                                    
+                                </tr>
+                            </tbody>
+                        </table> 
+                    </div>
+                </div>
+
+            </div>
+
+            <a href="/quanlychinhanh/tokhaicovidNhanvien/<%= tokhaiembednhanvien._id %>"><i class="fa fa-print"></i> In PDF tờ khai covid của nhân viên</a>
+        </div>
+<%- include('../views/layouts/khuc_cuoi.ejs') %>

@@ -1,0 +1,30 @@
+<%- include('../views/layouts/khuc_dau.ejs') %>
+<%- include('../views/layouts/header.ejs') %> 
+        <div class="container">
+            <h1 style="background-color: rgb(222 234 77); color: rgb(255,255,0);" class="index_title">Employee Personal Covid19  information</h1>
+
+            <!--định dạng CSS thông điệp tương tự view register và login_mobile_w3css-->
+            <% if(message){%> 
+                <div class="directMessage w3-panel w3-pale-green user-message user-message--error">
+                        <%= message  %>
+                </div>
+            <%}%>
+
+            <div style="min-height:100%" class="index_main_section">
+                <ul>
+                    <li>Tên nhân viên: <b style="color:rgb(208,120,0)"><%= hotenNV %></b></li>
+                    <li>Thân nhiệt: <b style="color:rgb(208,120,0)"><%= tokhai.Than_nhiet  %></b></li>
+                    <li>Vaccine1: <b style="color:rgb(208,120,0)"><%= tokhai.HangSX_mui_1  %></b></li>
+                    <li>Vaccine2: <b style="color:rgb(208,120,0)"> <%= tokhai.HangSX_mui_2  %></b></li>
+                    <li>Vaccine3: <b style="color:rgb(208,120,0)"><%= tokhai.HangSX_mui_3  %></b></li>
+                    <li>Vaccine4: <b style="color:rgb(208,120,0)"><%= tokhai.HangSX_mui_4  %></b></li>
+                    <li>Ngày tiêm mũi 1: <b style="color:rgb(208,120,0)"><%= tokhai.Ngay_tiem_mui_1   %></b> </li>
+                    <li>Ngày tiêm mũi 2: <b style="color:rgb(208,120,0)"><%= tokhai.Ngay_tiem_mui_2   %></b></li>
+                    <li>Ngày tiêm mũi 3: <b style="color:rgb(208,120,0)"><%= tokhai.Ngay_tiem_mui_3   %></b></li>
+                    <li>Ngày tiêm mũi 4: <b style="color:rgb(208,120,0)"><%= tokhai.Ngay_tiem_mui_4   %></b></li>
+                    <li>Kết quả xét nghiệm: <b style="color:rgb(208,120,0)"><%= tokhai.Ket_qua_xet_nghiem  %></b></li>
+                </ul>  
+            </div>
+            <%- contactus  %>
+        </div>
+<%- include('../views/layouts/khuc_cuoi.ejs') %>

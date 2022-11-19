@@ -1,0 +1,1230 @@
+- mongoose 6.5.3 ✔️ 
+   ** trước kia 5.2.17 có 1 high vulnerabilities bị Snyk nhắc, giờ 0 còn 
+
+- Schema làm cơ sở cho từng Model to build data/document shape ✔️ 
+   const mongoose=require('mongoose');
+   const xSchema=new mongoose.Schema({
+
+   })
+   module.exports = mongoose.model('X', xSchema);
+
+- congty.schema.js ✔️
+- (manually 😞 chủ động tạo csdl ngay trên mongodb) create database in mongodb => Không phải cách hay
+   => ✅ (không cần, khi chạy mongodb uri sẽ tự thấy tên CSDL và tạo tự động) => 🆘 nhận định sai, thấy tên DB trên mongoUri thì không tạo CSDL, mà phải tạo collection đầu tiên trước 
+   => 🔱 Solution? : https://mongoosejs.com/docs/connections.html (to register connections with a dependency injector) => sẽ chưa chạy được cho tới khi modify một chút
+   taoCSDLvaFirstCollection()✔️ 👉  NHANVIENQUANLY là CSDL và congties là collection đầu tiên✔️
+   createNewCongty()✔️          👉  populate dữ liệu vào CSDL NHANVIENQUANLY  ✔️
+
+- dotenv để lưu sensitive information 
+  ** MONGODB_URI ✔️
+    *** .connect(process.env.MONGODB_URI) //chỉ tên database trong MONGODB_URI rồi npm start KHÔNG giúp tạo new database trên MongoDb ✔️
+  ** PORT ✔️
+
+- đã schema the shape cho Cong_ty data ✔️
+
+- "start": "nodemon index.js" ✔️  (để giúp chạy server với npm start)
+
+- quanlychinhanh.schema.js ✔️
+- quanlydonvi.schema.js ✔️
+- nhanvien.schema.js ✔️
+
+- routes 
+   ** app.use('/',visitorRoutes); --> ✔️ http://localhost:3002/
+   ** http://localhost:3002/admin/login ✔️
+   ** http://localhost:3002/employee/login ✔️
+   ** http://localhost:3002/quanlychinhanh/login ✔️
+
+- MVC controller actions: 
+   ✅ visitor
+      ⚽️ getIndex ✔️ 👉 style cho trang này  https://youtu.be/3hZuBesdJS8
+
+   ✅ nhanvien
+      ⚽️ menu Login
+         *** màn hình Login 👉  https://youtu.be/3hZuBesdJS8
+      ⚽️ menu Register ✔️
+         *** 😨 Email/Username
+         *** flash message thông báo đã đăng ký thành công, redirect tới trang login
+      ⚽️ Sau khi nhanvien log in SUCCESSFULLY, lưu session của nhanvien vào MongoStore  
+         *** https://expressjs.com/en/resources/middleware/session.html
+            **** để tính toán view counter 
+            **** để khi user login, có thể keep a user login session 
+      ⚽️ menu Personal Profile 👉 xem , sửa ✔️
+         *** với Xem, xem dự án mẫu để dùng web API controller lấy dữ liệu về và xử lý hiển thị
+              👉 làm việc với thư mục webAPI đang rảnh 
+      ⚽️ menu Employee Covid 19  ✔️
+      ⚽️ menu Statistics 👉 xem giờ làm, lương ✔️
+      ⚽️ menu Điểm danh giờ làm và kết thúc ✔️
+      ⚽️ Cần có collection nhanviens để lưu trữ thông tin thôi (không thêm có thông tin khác như annualYearLeave, updatedAt .... vào đây)
+            module.exports = nhanvienSchema ✔️
+      ⚽️ Và có collection có reference nhanvienId để điểm danh giờ vào giờ ra --> đối tượng DiemDanh này sẽ được in ra JSON gửi cho nhà quản lý xem duyệt
+            diemdanh.nhanvien.schema.js ✔️
+
+      ⚽️ Khi register chỉ cho nhanvien đăng ký username , password thôi (các fields còn lại của schema không cần required:true nghĩa là không bắt buộc điền. Khi login thành công thì bổ sung Profile vào CSDL (save cập nhật thêm thông tin bên cạnh username và password )) 
+         => what if thực hiện liên tiếp 2 lần POST form ?? Khi đó username password xong thì tới form thông tin cá nhân => Tất cả thông tin lưu thành công vào CSDL sẽ tới 1 trang Login 
+         => Muốn lưu thành công liên tiếp 2 post form thì cần req.session (session() sẽ tạo 1 cookie máy khách ) chứ không dùng req.body vì tới trang sau sẽ lost req.body.username và req.body.password
+   
+   https://express-validator.github.io/docs/ ✔️
+   https://express-validator.github.io/docs/sanitization-chain-api.html ✔️
+   const { check, body } = require('express-validator/check');✔️
+
+   ✅ admin
+         => https://stackoverflow.com/questions/66120484/what-is-the-purpose-of-storing-the-session-in-a-session-store-like-mongo-store 
+            *** Well, I use it for analytics. Like how many sessions we had today. Or yesterday. Or for the year.
+            *** BUT if you don’t use something like redis of mongo, all your MEMORY will get eaten up. Express-session isn’t built for production environments.
+            *** Yeah, so when you use express-session or another MEMORY bases session manager, everytime the server restarts, the memory is cleared
+            *** câu hỏi là req.session xuất hiện khi nào? Sau khi chạy session() của express-session hay sau khi store:store lưu session vô MongoDB ? 
+               **** https://stackoverflow.com/questions/68841518/storing-sessions-with-express-session-connect-mongo-and-mongoose
+               **** có lẽ là sau khi req mang cookie chảy qua session() sẽ tạo req.session => https://stackoverflow.com/questions/51731771/node-js-how-to-save-a-users-shopping-cart-in-express-session
+               app.post('/api/cart', (req, res) => { 
+                     ✔️ var cart = req.body; 
+                      req.session.cart = cart;    //gán thông tin cho session
+                      req.session.save(err, sessionCart) =>{    //lưu session vào MongoStore with save()
+                      console.log(sessionCart); 
+                      if(err){ throw err; }       
+                      res.json(req.session.cart);
+               **** Nếu vậy thì truy cập session trong MongoStore để làm gi khi nào cần  
+  
+            ***  So, if it is in the database, the database isn't cleared on server reset. if memory is cleared, the user will be logged out. This will not happen if the cookies are stored in the database.
+            => what is purpose of express-session trong development (không phải production) (không nói tới lưu session trong MongoStore)
+                **** có phải chỉ để tạo cookie thôi. Khi server restart thì hết session, sẽ bị loggout ??
+            *** https://viblo.asia/p/tuong-tu-nhu-session-trong-node-js-tu-php-sang-node-js-V3m5WyqbZO7
+            *** session stores
+               **** MemoryStore vs MongoStore
+               👉   Làm sao lưu cả 2 nơi? 
+                  ***** plan 1: biến isLoggedIn và user được lưu vào trong MongStore sau khi login thành công 
+                  ***** plan 2: sau mỗi vòng login sẽ regenerate sessin // regenerate the session, which is good practice to help guard against forms of session fixation
+                        👉 https://expressjs.com/en/resources/middleware/session.html
+               **** CÁCH access mỗi loại?
+                  ***** https://stackoverflow.com/questions/19889552/how-to-access-express-session-memorystore-via-socket-io-objects
+      ** Planing 
+         *** tải express-session ✔️
+            **** chạy app.use(session(  chưa có store nào đăng ký trong đây thì Express's session store mặc định chính là MemoryStore lưu trên RAM ))   ✔️
+               ***** khi req mới nào chảy qua (có hoặc không mang chuỗi cookie do browser đính kèm) thì tất nhiên là nhận session. Lúc này trên MongoDB không lưu session nào hết, nghĩa là session hiện chỉ ở Backend stack, không có ở Database stack
+            **** vì sao mỗi req mới tới, mã urlencoded cookie không đổi nhưng sessionID luôn đổi? 
+               👉 do req.session không bền (data persistence), bị hủy mỗi khi F5 aka req mới tạo thành. Do đó req mới thì ứng với sessionID mới 
+            **** truy cập req.sessionID lưu  trên memory RAM của máy chủ (với MemoryStore?), sẽ dẫn tới tốn RAM và khi máy chủ mất điện thì session mất theo. Do đó muốn lâu bền (persist, trong NodeJS có module Node-persist) phải lưu session trên MongoDB (MongoStore)  ✔️
+           
+         *** tải cookie-parser ✔️
+            **** để lấy giá trị cookie trong máy khách ✔️
+            **** console.log("req cookie:\n",req.cookies); //ok, nhưng req.cookies là dĩ nhiên có, đâu cần cookieParser?
+               ***** thử secret:'secret to sign cookie' trong session rồi 
+                  // Cookies that have been signed
+                  console.log('Signed Cookies: ', req.signedCookies)
+
+      ** cho admin register với admin user name và password trong .env  ✔️
+         *** router.post('/register', userInput express validator , adminController.postSignup) ✔️
+         *** các validator error sẽ hiển thị ở vị trí nào trong view , view /register hay view /login ???
+            **** Nếu có error thì style hộp message thế nào? 
+            <!--cần style bảng div#directMessage, dùng link của link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" 👉 class="w3-panel w3-pale-green"-->
+               <% if (errorMessage) { %>
+                ✔️   <div id="directMessage" class="w3-panel w3-pale-green user-message user-message--error"><%= errorMessage %></div>
+               <% } %>
+
+      ** Tại Assignment_phan5 sẽ style cho 3 phần trang web head,body,footer
+         *** how to add images to .txt file? https://www.computerhope.com/issues/ch000740.htm
+         *** form hiện tại quá lớn bề ngang, làm tràn qua phải ra ngoài màn hình mobile first
+            **** https://www.w3schools.com/w3css/w3css_input.asp
+            **** Kết quả: ✔️ nhanvien controller dùng login_mobile.ejs có W3.CSS thì đáp ứng mobile first 
+                          ❌ admin controller dùng login.ejs (không có W3.CSS thì không đáp ứng mobile first)
+            **** login_mobile_w3css.ejs  ✔️
+            **** login_mobile_bootstrap5.ejs  ✔️
+            **** login_mobile_maximillian ❌
+            **** register --> w3css mobile first ✔️
+
+      ** Tại Assignment2_phan6
+         *** chú ý CSS , dùng Google Color Picker lấy màu đẹp của các website khác cho vào Snippets ✔️
+         *** độ ưu tiên inline CSS  trong một tag ; Internal CSS ; External CSS  ✔️
+         *** Tuy nhiên Footer còn to quá 🙈, lý do là khi màn hình iphone4 Footer nhìn rất gọn, còn MaxHub thì footer to  ✔️
+      
+      ** Tại Assignment2_phan7 ✔️
+         *** chỉnh lại tổng thể website layout:  header và footer cho đều https://www.w3schools.com/w3css/tryit.asp?filename=tryw3css_default_intro
+            **** problem hiện tại với desktop screen and mobile first ? 
+            **** https://www.w3schools.com/w3css/w3css_mobile.asp
+
+      ** Assignemnt2_phan11   ✔️
+         ** sắp xếp lại thứ tự trong index.js so với phan10
+         
+         ** await CongTy.countDocuments vẫn có vấn đề. Xem lại lý thuyết
+             *** https://www.geeksforgeeks.org/mongoose-countdocuments-function/
+
+      ** Assignment2_phan12 ✔️
+         ** Nếu có promise thì không dùng callback: bỏ callback function (err, count)  và dùng then().catch()
+
+      ** Assignment2_phan13
+         ** save dữ liệu admin vào MongoDB  ✔️
+            *** ❓ với password đã nhập manu thì làm sao áp dụng bcryptjs trên CSDL hàng loạt bảng ?? 
+            *** 💡(Python) https://www.geeksforgeeks.org/hashing-passwords-in-python-with-bcrypt/
+            *** 💡 (PHP) https://www.geeksforgeeks.org/how-to-use-bcrypt-for-hashing-passwords-in-php/
+            *** (Nodejs) bcrypt hash password and compare passwords synchronously
+               **** (Lý thuyết) https://www.freecodecamp.org/learn/information-security/information-security-with-helmetjs/understand-bcrypt-hashes
+               **** Hint 1: Add bcrypt to your project as a dependency.
+               **** Hint 2: After you add it, you need to require it in the server file.
+            *** (Nodejs) (Implement bcrypt) https://www.geeksforgeeks.org/password-encryption-in-node-js-using-bcryptjs-module/
+               **** tải npm install bcryptjs --save ✔️
+
+         ** save dữ liệu nhân viên 
+            *** NV phải nhập cả danh sách ngoại ngữ, nên phải manually nhập vào CSDL ✔️
+            *** ban đầu nhập khẩu nhanvien.model() vào app.js để tạo bảng sẵn trên CSDL
+               **** const nhanvienMongooseModel=require('./MODELS/nhanvien.model'); ✔️ //ok, được phần mềm đọc qua và tạo bảng rỗng nhanviens 
+               **** Insert Document >> nhập tay dữ liệu cho nhân viên 
+                  ***** làm sao copy paste cho nhanh? https://studio3t.com/knowledge-base/articles/copy-paste-mongodb-documents/
+                  ***** Note: Mức lương 10202093  là kiểu Int32 ✔️
+         ** đã manually nhập nhanviens, admins, quanlychinhanhs, congties ✔️
+         ** nhanviens --> thêm startDate và annualLeave, Image 
+         ** nhanvien postLogin
+            *** https://www.geeksforgeeks.org/login-form-using-node-js-and-mongodb/
+         ** const app = express(); //Security matters! 
+            *** Snyk security recommendation: Consider using csurf middleware for your Express app to protect against CSRF attacks (không phải csurf attacks)
+            *** Snyk: exposed used framework to potential attackers, consider using Helmet middleware to disable the X-Powered-By header for your express app
+            *** 💡 https://www.geeksforgeeks.org/implementing-csurf-middleware-in-node-js/   
+               **** tải  🛡 npm install csurf --save ✔️ 
+            *** 💡 https://www.geeksforgeeks.org/node-js-securing-apps-with-helmet-js/    ; https://www.veracode.com/blog/secure-development/fasten-your-helmetjs-part-1-securing-your-express-http-headers
+               **** tải  🛡 helmet.js module: npm install helmet --save ✔️ 
+               **** tuy nhiên res headers có TLS security protection set by helmet
+               **** https://social.technet.microsoft.com/Forums/sharepoint/en-US/832e580d-dbdd-4f0f-9d38-26a6b1d11291/cant-connect-securely-to-the-page-this-might-be-beacuse-the-site-uses-outdated-or-unsafe-tls
+               **** https://stackoverflow.com/questions/61427858/tls-connection-error-this-might-be-because-the-site-uses-outdated-or-unsafe-tls
+         
+      ** Assignment2_phan14
+         *** bỏ helmet vì website không hoạt động  (làm localhost:3002 với initiator là '/' index đã bị blocked vì vi phạm CSP Content Security Policy) : npm uninstall helmet ✔️
+            **** Nói chung, helmet can secure your Express app 
+            **** Solution: đổi 3002 thành port 3005 ✔️
+
+         *** app.disable('x-powered-by') ✔️  (nghiên cứu helmet sau)
+            **** https://stackoverflow.com/questions/61364808/expressjs-disabling-x-powered-by-header
+
+         *** app.use(helmet({
+                 crossOriginResourcePolicy: false
+               }));
+            //chỉ để giải quyết https://stackoverflow.com/questions/70752770/helmet-express-err-blocked-by-response-notsameorigin-200
+         *** Network không thấy route gì hết --> doc + bỏ hết chọn như "block 3rd cookie" ✔️
+         *** https://stackoverflow.com/questions/37935657/refused-to-load-the-image-because-it-violates-content-securtiy-policy-cordova
+         *** 💢 có cái này rồi trở lại Helmet bị báo lỗi nữa, thì bỏ helmet với meta này thì trở lại 
+             **** <meta http-equiv="Content-Security-Policy" content="script-src 'self' http://localhost:3002 https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js  https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js 'unsafe-inline' 'unsafe-eval'; ">
+    
+      ** Assignment2_phan15
+         *** login với nhanvien ✔️
+            **** https://stackoverflow.com/questions/31549857/mongoose-what-does-the-exec-function-do
+            **** https://stackoverflow.com/questions/67608299/typeerror-req-next-is-not-a-function-node-js
+            **** https://stackoverflow.com/questions/43702840/node-js-req-next-is-not-a-function
+            **** https://www.appsloveworld.com/nodejs/100/46/typeerror-req-next-is-not-a-function
+
+         *** nếu có validation error thì thực hiện POST req tới /nhanvien/login nhưng re-render lại trang ✔️
+            **** đồng thời cho biết errorMessage là gì ✔️
+                 'Password has at least 4 characters, please'
+         *** login thất bại
+            **** sai so trùng mật khẩu
+            **** res.redirect('/login'); 
+         *** login thành công?
+            **** đặt req.session.user
+            **** res.redirect('/')
+         *** có res 2 lần và báo lỗi 🎁 TypeError: req.next is not a function 
+
+      ** Assignment2_phan16
+         *** sửa lại lỗi của phan15  ❓
+         *** Problem là res gửi cho client trước khi findOne hoàn tất , do đó res của findOne không thực hiện được và báo lỗi 2 lần res headers sent to client  ✔️
+         *** Problem khác là 1 admin được tạo nhiều lần theo req ✔️
+
+      ** Assignment2_17
+         *** Sửa 2 lần req headers sent ✔️
+         *** Sửa 1 admin được tạo nhiều lần theo req  ✔️
+            **** việc register admin chưa có điểm chặn, nên có thể bị tạo nhiều admin trùng nhau
+         *** https://www.tutorialspoint.com/expressjs/expressjs_sessions.htm
+            **** 💢 Problem is HTTP is stateless . 👉 Vậy liên quan cách nào giúp mọi req khác nhau đều truy cập MemoryStore để lấy dữ liệu
+         
+         *** quản lý LOGIN SESSION
+            **** https://www.tutorialspoint.com/expressjs/expressjs_sessions.htm#s
+            **** https://codeforgeek.com/manage-session-using-node-js-express-4/
+
+            **** 👉 tạo is-auth middleware để người chưa login thì không tới link được (nhấn nút hay URL typing), còn người login thì vào được
+            
+            **** 👉 bắt đầu xóa thử nghiệm cũ trên MemoryStore thì sẽ là uninitialized session (lý do là đã configure saveUninitialized: false? Không liên quan vì cái này liên quan session entry trên database?? )
+            **** 👉 tạo initialized session bằng cách gán biến ngay khi login nhanvien thành công
+
+            **** 🧬 login session 🧬 của nhân viên 
+               ***** login thành công đi tới Home ✔️ + msg "đăng nhập thành công" ✔️ + có nút đăng xuất sau khi login thành công ✔️ 
+               ***** res.redirect('/admin/products'); //the point is: Có cần mảng products để gửi cho view 'admin/products' không?? Không vì đang yêu cầu client gọi http://localhost:3000/admin/add-product được xử lý logic bởi exports.getProducts controller action , which send server information 'products' to view  ✔️
+               ***** khi chọn Employee để tới trang /nhanvien/login, nơi này vẫn hiện các menu cho nhân viên (hay vẫn cho nhập GET req trên search bar) nhưng chỉ có nhân viên đã login thành công mới được endpoint handler xử lý
+                 => middleware whether-auth-or-not.js ✔️
+                 => muốn vậy cần tạo biến session chứa user ngay sau khi đăng nhập thành công ✔️. 
+                 => Sau khi có req.session.user thì cần track user ngay từ khi req lần đầu chảy vào app 👉 Do đó gắn user vào req mới tới (req.user) là điều cần làm 👉 cần check xem req.session.user bên trong MemoryStore có gọi được Mongoose magic methods hay không  ✔️
+               ***** Kết quả là:
+
+               req.session.user.findOne({Mat_khau:'NV_1',Ten_Dang_nhap:'NV_1'})
+                            .then(user=>{
+                                console.log("Kết quả thí nghiệm req.session.user trong MemoryStore có thực hiện Mongoose magic methods được hay không: ",user);
+                                //💎 undefined. Err, we detected an error: TypeError: req.session.user.findOne is not a function ✔️
+                            })
+         
+              => kết quả trên cho thấy, cho dù các req xa lạ cùng sở hữu một logon session của một máy client, thì cũng không gọi hàm Mongoose được  ✔️
+              => trong app.js ngay từ đầu npm start phải dùng req.user . Hi vọng gọi mongoose model được 
+
+         *** Assignment2_17_phan2
+            **** design cho nút Logout ✔️
+            **** sau khi nhanvien login thành công sẽ tới Home và trên thanh dieu_huong có nut Logout.   ✔️
+               => khi nhấn logout sẽ hủy session trong MemoryStore
+            **** Cannot GET /nhanvien/logout
+               ***** Lý do là <li><a href="<%=`/${role}`%>/logout"><span class="glyphicon glyphicon-log-in"></span> Log Out</a></li></li>
+            **** hoàn tất postLogin action 
+               ***** dùng req.sesion to store asn access session data (on server)
+               ***** req.session.user = user   ✔️
+            **** Thí nghiệm 01: lý thuyết connect.sid , req.session chứa session cookie setting 
+               ***** 👉 http://www.senchalabs.org/connect/session.html#warning
+            **** kết quả thí nghiệm 01: 
+               ***** ✅ req.session chứa uninitialized session (chỉ chứa biến Session có cookie mặc định) và 
+               ***** ✅ sessionStore với biến sessions đang rỗng  
+               ***** ✅ chúng ta cần session trên server vừa giúp bảo mật (để session data trên browser sẽ bị đọc và thay đổi) vừa giúp kết nối các req mới riêng rẻ cùng thuộc một client
+
+         *** Assignment2_18
+            **** Thí nghiệm 02: session.cookie.maxAge null cho thấy no "expires" parameter is set so the cookie becomes a browser-session cookie. When the user closes the ✔️
+browser the cookie (and session) will be removed.
+            **** dùng req.session.user giúp NhanvienModel tìm ra user và user này có thể thực hiện các hàm mongoose magic 
+            **** tham khảo store session trên mongodb 👉 https://developer.okta.com/blog/2021/06/07/session-mgmt-node   
+            **** cơ chế express quản lý session:  👉 https://stackoverflow.com/questions/18512461/express-cookiesession-and-mongoose-how-can-i-make-request-session-user-be-a-mon
+            **** https://stackoverflow.com/questions/12453249/nodejs-connect-express-how-session-manage-memory
+            **** Câu hỏi là sau khi sessionStore lưu được req.session thì req mới tiếp theo truy cập được không??
+               ***** VD, req tại GET '/' http://localhost:3002/nhanvien/login thành công login thì có sessionStorage, vậy tiếp theo chọn GET '/' thì có nhận được không ?? 
+               ***** tổng quát là có req.session.user ở postLogin thành công, vậy tất cả req mới về sau ở app.js có nhận được req.session.user không? (Thí nghiệm 03)
+
+            **** Kết quả thí nghiệm 02:
+               ***** ✅ console.log("req.cookies là: ",req.cookies); //nếu browser chưa có connect.sid cookie thì chỗ này undefined với req đầu tiên
+               ***** ✅ req.session.country được khai báo và req.session.save() vào sessionStore lưu biến này
+            **** Thí nghiệm 03: ✔️
+            **** Thí nghiệm 04: ✔️
+            **** Thí nghiệm 05: dựa trên cookie maxAge là null  ✔️
+               ****** case1: đóng tab broser, mở tab khác 👉  cookie không đổi
+               ****** case2: đóng trình duyệt,mở lại     👉   cookie cũ bị xóa, cookie mới được gán vào
+
+         *** Khắc phục bảo mật của GET req bằng URL trên thanh tìm Kiếm
+            **** https://www.smashingmagazine.com/2017/04/secure-web-app-http-headers/
+            **** https://owasp.org/www-community/vulnerabilities/Information_exposure_through_query_strings_in_url
+            **** GET req 👉	Data is visible to everyone in the URL
+               ***** https://reqbin.com/Article/HttpGet
+            **** xử lý hiển thị trên thanh dieu_huong là chưa đủ, vì nếu biết route thì client vẫn gõ GET rql tới endpoint 
+               => phía server cần chận có req nào chưa login, redirect nó trở lại trang login  
+            **** Nhanvien
+               ***** trạng thái hiện tại: 
+                  ****** Use case 01: nhấn nút Login thành công sẽ tới trực tiếp http://localhost:3002/nhanvien/view_personal_profile
+                  ****** Use case 02: tại trang Home, chưa login mà gõ trực tiếp trên thanh tìm Kiếm 📡 http://localhost:3002/nhanvien/view_personal_profile
+                        👉 Cannot read properties of undefined (reading 'Ho_ten') , lý do là biến đối tượng employee là undefined
+                        👉 Làm lộ các đường dẫn của app 
+                           Solution 1 👉 cần error handling với trang 404 hay 500
+                           Solution 2 👉 chận xử lý hiển thị view nhanvienProfile bằng cách để (middleware checkLoginStatus.nhanvienIfLoggedIN, nếu ghi checkLoginStatus sẽ báo lỗi yêu cầu endpoint handler) tại tầng router "routes" , ngay trước endpoint handler postLogin của nhanvien . Khi đó gõ URL để xem nhanvien profile sẽ bị redirect về trang login ✔️
+               ***** trạng thái lúc sau: nếu chưa login mà ghi http://localhost:3002/nhanvien/view_personal_profile  sẽ bị quay lại http://localhost:3002/nhanvien/login ✔️
+
+
+                              
+         *** Assignment2_19  
+            **** 💢 Problem: req.session.user chỉ cho biết data , chứ không lưu trữ methods đặc biệt là Moongoose magic methods ✔️
+            **** 💊 Solution: dùng id trong req.session.user._id để biết ai đang loggedIn, để nhanvienMongooseModel sử dụng id này giúp tạo a Monggose model with magic methods và các user-defined methods in schema ✔️
+            **** sau khi đăng nhập thành công, tới http://localhost:3002/nhanvien/view_personal_profile thì cần fetch data cho trang này using GET request ✔️
+            **** màn hình nhập thông tin covid cá nhân Nhanvien
+            **** màn hình xem thông tin covid cá nhân Nhanvien
+               ***** //GET --> /nhanvien/manHinhNhapCovidNhanvien , sẽ không cho fetch form nếu chưa đăng nhập ✔️
+router.get('/manHinhNhapCovidNhanvien',checkLoginStatus.nhanvienIfLoggedIN,nhanvienController.getFormInputCovidNhanvien); ✔️
+               *****💢 problem: http://localhost:3002/nhanvien/manHinhNhapCovidNhanvien  cannot open the dropdown menu trên dieu_huong
+            **** tạo Schema cho Tờ khai covid 19 trong thư mục Schema
+               ***** https://mongoosejs.com/docs/schematypes.html   ✔️
+               ***** Schema cho tờ Khai Covid nhanvien ✔️
+               ***** userId: user   
+                  ****** tham khảo: NJS Lab10.18
+                  userId: {
+                           type: Schema.Types.ObjectId,
+                           required: true,
+                           ref: 'User'
+                     }
+                  sau đó gán userId:user hay userId:req.user   cũng đều gán id thôi 
+
+
+            **** Model cho tờ Khai Covid nhanvien cho thư mục Model ✔️
+               ***** module.exports=mongoose.model("NHANVIENTOKHAICOVID",require('../SCHEMAS/nhanvienCovid.schema'));
+               👉 nhưng chưa có trên mongodb webAPI
+               👉 Solution: giúp tạo bảng ngay khi khởi động ứng dụng tại app.js  ✔️
+               
+
+
+            **** nhập thông tin covid cho từng người
+               **** nhập xong người 1 thì Log out  ✔️
+               **** đăng nhập người 2 rồi nhập covid cho người 2 , rồi log out  ✔️
+
+            **** cho phép nhân viên xem thông tin covid của mình
+               **** menu Follow Personal Covid19
+                  *****💢 problem: không mở được Role Filter
+
+         *** Assignment2_20
+            **** chạy trong app.js để tạo collection rỗng trong MongoDB 
+               ****** tokhaiDiemDanh ✔️
+               ****** tokhaiKetThucLam ✔️
+            **** Tìm solution cho : 
+                 ***** menu Follow Personal Covid19 khi mở trang, thì trang đích có Role Filter bấm sẽ redirect req mới chứ không chịu drop down  ✔️
+
+                 *****💢 problem: không mở được Role Filter drop down, vì click tới là nó chạy a href một req mới , trong khi các menu khác thì không tạo req mới   ✔️
+                 => (✅ Thay vì bấm a hay button để có link drop down, hover sẽ không tạo req mới mà vẫn tạo drop down) https://www.w3schools.com/howto/tryit.asp?filename=tryhow_css_js_dropdown_hover ✔️
+            **** login cho admin 
+               **** User case 1: Ten_Dang_nhap: username  , trong đó vế phải sai tên input  👉 mongoose tạo js object với Ten_Dang_nhap là undefined  ✔️
+               **** User case 2: gán input name đúng cho Schema path nhưng bỏ trống 1 trong 2 ô username hay password 👉 ''  (chứ không có undefined) ✔️
+                  ***** VD bỏ trống ô username 
+                  ***** thì Mongoose parses thành admins.findOne({Ten_Dang_nhap:'',Mat_khau:'ADMIN_123456'}); ✔️
+               **** đã login thành công cho admin ✔️
+                  ***** tạo collection DIEM_DANH_NHAN_VIEN lúc npm start ✔️
+                     ****** Tên nhân viên 
+                     ****** Nơi làm việc
+                     ****** Thời gian bắt đầu (giờ của server)  
+                        ******* https://stackoverflow.com/questions/45391084/how-to-show-real-time-server-date-and-time-on-nodejs
+                        ******* https://stackoverflow.com/questions/24738169/how-can-i-get-the-current-datetime-in-the-format-2014-04-01080000-in-node
+                        ******* server time khác với local time: https://stackoverflow.com/questions/45102886/mongodb-query-date-field-with-the-server-time
+                        ******* https://stackoverflow.com/questions/42075690/how-to-get-the-server-time-in-the-mean-stack-mongodb-express-angular-node
+
+                        
+                        ******* xem xét trong app.js ✔️
+                           var d = new Date();
+                           console.log(d.toJSON().slice(0,19).replace('T',':'));
+
+
+                  👉  save(res.redirect(tới trang Diem danh và thấy trang thái "Không làm việc" chuyển thành "Đang làm việc"
+                  🎁    cho phép tạo collection nhiều lần trong Ngày
+
+                  ***** tạo collection KET_THUC_PHIEN_LAM_VIEC_CUA_NHAN_VIEN lúc npm start ✔️
+                     ****** Số giờ đã làm hôm nay
+                     ****** Danh sách các {luot_bat_dau ; luot_ket_thuc ; noi_lam_viec}
+                  ***** sau đó nếu làm việc tiếp tục thì save phiếu điểm danh mới 
+                  👉  save(res.redirect(tới trang Diem danh và thấy trang thái "Đang làm việc" chuyển thành "Không làm việc"
+                  🎁    cho phép tạo collection nhiều lần trong Ngày
+                
+                   
+
+            **** Nhan vien
+               ***** fetch data GET req: 
+                  ****** view: employeeCovidInfo.ejs  ✔️
+                  ****** màn hình Sửa thông tin nhân viên 👈
+               ***** đăng ký checkin và xem thông tin checkin ✔️
+
+
+         *** Assignment2_21
+            
+            **** 💢 Làm sao cho Dropdown và chọn xong sẽ hiện trên chữ Dropdown ?
+               ***** ✅ Solution: EJS <%= role %> ✔️
+            **** (Làm tiêu chí 6) GIÚP ADMIN LOGIN  và LOGOUT 
+               ***** admin login thành công, thì req.session.admin=admin; xem console.log(req.sessionStore) thấy có lưu nguyên anh admin
+                  => tiếp theo làm middleware  xét xem admin có loggedin chưa: if(!req.session.admin) ✔️
+                  => nếu chưa login cho admin mà gõ thẳng URL http://localhost:3002/admin/login thì bị tới trang login của admin ✔️
+               ***** không restart server (vì maxAge của cookie là null nên sẽ bị xóa khi tắt server)
+                  ****** logout khỏi admin? CHƯA CÓ NÚT loggout cũng được
+                  ****** trong app.js , thì MemoryStore vẫn lưu đối tượng admin  ✔️
+                  ****** tiếp tục GET req để loggin thành công cho employee , rồi xem    console.log(req.sessionStore) ✔️
+                      => do admin biết credentials của mình và của employee nên giờ req.sessionStore lưu cả 2 đối tượng user và admin  ✔️
+               ***** giúp admin log out ✔️
+                  ****** sau khi admin login thành công thì tới trang  http://localhost:3002/admin/manageUsers ✔️
+               ***** trong http://localhost:3002/admin/manageUsers
+                  ****** tạo 2 Bootstrap hay W3CSS form Add Employee và Add Branch Manager để giúp thêm vào CSDL 
+                  ****** https://getbootstrap.com/docs/4.1/layout/grid/#auto-layout-columns
+                     ******* tạo 3 cột bằng nhau với col-sm-4: https://www.w3schools.com/bootstrap/bootstrap_grid_examples.asp ✔️
+                     ******* tạo 2 cột bằng nhau với col-sm-6: https://getbootstrap.com/docs/4.1/layout/grid/#auto-layout-columns ✔️
+                     ******* trong div.row thì dùng text-align:center để nội dung các cột nằm giữa  ✔️
+            **** Problem: khi admin đã login thì nút login bị giấu đi, thì nếu gõ http://localhost:3002/admin/login thì nên có thông báo: "Bạn đã loggin"
+                  => solution: xử lý hiển thị thanh dieu_huong.ejs ✔️ 
+            **** giúp EJS dynamic hơn với Chuoi_HTML nhận từ controller
+               ***** vd 1 biến ejs có thể nhận Chuoi_HTML_form_W3CSS hay Chuoi_HTML_form_Bootstrap5 ✔️ 
+ 
+         *** Assignment2_22  
+            **** giúp QLCN thực hiện login 
+               ***** router.get('/login', quanlychinhanhController.getLogin);  ✔️
+               ***** design trang login của QLCN ✔️
+               ***** Khi QLCN log in thành công, giúp tạo req.session.quanlychinhanh đồng thời render view "index.ejs" dành riêng cho QLCN✔️
+               ***** giúp QLCN log out  ✔️
+
+         *** Assignment2_23 
+               ***** giúp admin sau khi login được redirect tới manageUsers, nếu sau đó admin muốn tới Home menu thì sẽ tới endpoint http://localhost:3002/ sẽ có trang phục vụ riêng với các menu options 
+                  ****** khi chưa login thì trang Home là của visitor , khi admin đã login thì trang này nhận các biến liên quan tới admin ✔️
+                  ****** cần thay đổi sao cho biến role trong '/' >> getIndex >> index.ejs >> dieu_huong.ejs trở nên dynamic based on specific loggingIn human object !  ✔️
+                  ****** controllers >> visitor.controller.js >> router.get('/', visitorController.getIndex); ✔️
+               => đã tạo Home page dedicated to a specific LoggedIn human type : loggedIn admin, loggedIn nhanvien, loggedIn quanlychinhanh   ✔️
+  
+            **** giúp QLCN xem thông tin covid của nhân viên mà mình quản lý
+               ***** https://www.geeksforgeeks.org/how-to-get-data-from-2-different-collections-of-mongodb-using-node-js/
+               ***** menu:😷 Employee Covid19
+               ***** route 
+                  ******  router.get('/thongtinCovidNhanvien',checkLoginStatus.qlcnIfLoggedIn,quanlychinhanhController.getEmployeeInfo);
+
+               ***** endpoint handler (aka app URI response)
+                    exports.getEmployeeInfo=(req,res,next)=>{
+    
+                     }
+            
+
+            **** MongoError: findOne() buffering timed out after 10000ms   ✔️
+               ***** 💢 Lý do , model() và các hàm mongoose chạy mà không cần có mongoose-mongodb connection trước. Vì sẽ được cho vào buffer để cố gắng ra kết quả một khi mongo connection thành công 
+               ***** ✅ solution: chỉnh current IP address trên MongoDB 
+
+            **** QLCN 
+               ***** xem thông tin covid của những nhân viên mà MÌNH quản lý 
+               ***** idea: so sánh Thoi_gian_bat_dau_theo_server và createdAt, khi đó nhà quản lý xác nhận
+               ***** Khi EJS access dữ liệu của MongoDB 
+                  ****** SCHEMA thiếu Role thì undefined 
+                     👉 Role:{type: String, required: true} , được bổ sung thì ok ✔️
+                  ****** MongoDB thiếu Ma_so cũng undefined ✔️
+               ***** đã trích được tất cả nhân viên của 1 chi nhánh nào đó ✔️
+               ***** giúp Quản lý xem thông tin covid từng NV ✔️
+                 
+               **** dùng Flip card để 1 mặt là Thông tin nhân viên, 1 mặt là Thông tin Covid của người đó  
+            **** Candidates:
+               ***** https://bbbootstrap.com/snippets/bootstrap-5-flipping-cards-for-catalog-29291738
+               ***** https://bbbootstrap.com/snippets/bootstrap-5-card-flipping-using-glassmorphism-54393107
+               ***** https://www.w3schools.com/howto/howto_css_flip_card.asp
+                  <div class="flip-card">
+                     <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                           <img src="img_avatar.png" alt="Avatar" style="width:300px;height:300px;">
+                        </div>
+                        <div class="flip-card-back">
+                           <h1>John Doe</h1>
+                           <p>Architect & Engineer</p>
+                           <p>We love that guy</p>
+                        </div>
+                     </div>
+                  </div>
+            **** lấy _id của nhân viên để yêu cầu Tờ khai Covid model find ra tờ khai có chứa _id đó
+                     tokhaiCovidNhanvienModel.find({
+                                nhanvienId: <%= nv._id  %>
+                            })
+                            .then(data=>{
+                                console.log(`Tờ khai covid cá nhân của nhân viên <%= nv.Ho_ten %> `);
+                            })
+                            .catch(err=>console.log(err));
+            ****  router.get('/edit-product/:productId', isAuth, adminController.getEditProduct); ✔️
+                  <a href="/admin/edit-product/<%= product._id %>?edit=true" class="btn">Edit</a> với _id lấy từ CSDL     ✔️            
+                  const employeeId = req.params.nhanvienMongoId; ✔️
+                  Product.find({ userId: req.user._id })
+                        .select('title price -_id')
+                        .populate('userId', 'name')
+                        .then(products =>  
+                  //cách làm này sẽ tạo phiên bản products mới có các đối tượng product embeds user document tương ứng ✔️
+            **** hoàn thành Quản lý xem covid của từng nhân viên của mình ✔️
+            **** UI library  
+               ***** https://bootswatch.com/   
+
+         *** Assignment2_24 (đã xuất được pdf) ✔️
+            **** giới thiệu về pdf trong express
+               👉  https://www.geeksforgeeks.org/how-to-send-pdf-in-express-route-response-and-force-browser-download/
+            **** in PDF 
+               👉 https://www.youtube.com/watch?v=bSmUSLL2qKA
+               ***** lưu vào file tên Math.random() 
+               ***** https://www.npmjs.com/package/pdf-creator-node
+                  👉   const pdf = require('pdf-creator-node')
+                  👉   https://youtu.be/bSmUSLL2qKA
+                  👉     https://youtu.be/FJYZxPflwRU
+               ***** (pdfkit) 
+                  ****** https://www.andronio.me/2017/09/02/pdfkit-tables/
+
+
+                  ****** https://youtu.be/s4cTRyuGy_E 
+                  ****** 👉 instead of create `hardcoded` pdf với word rồi convert 👉 for BIG files , and stream response to clients
+                  ****** https://www.youtube.com/watch?v=BRJkW6Vr6yA
+                  ****** https://www.npmjs.com/package/pdfkit
+
+                  ****** https://youtu.be/s4cTRyuGy_E   (✅PDFKIT-CONSTRUCT package hỗ trợ hàm doc.addTable)
+                     🍒 có tạo bảng trong pdf
+
+                  ****** https://www.npmjs.com/package/pdfkit-table (✅PDFKIT-TABLE)
+                     🍒 https://www.andronio.me/2017/09/02/pdfkit-tables/
+                     🍒 có tạo bảng trong pdf  
+
+                  ****** https://youtu.be/fKewAlUwRPk (✅PDFKIT)
+                     🍒 we will not store pdf doc in the server side (file system), we will not buffer everything completely in memory before sending it back to client
+                     🍒 Instead, we will stream the document to the client
+                        🍒🍒 Clearly, we will basically send it back ON THE FLY (keyword này được thầy Maxi sử dụng ) as we receive the data on the client  
+                     🍒 PDFKIT is a good tool, pretty simple. Read the documentation and you can do literally anything with it . But now I create pdf file to work with expressjs . Then you can figure out the documentation by yourself 
+                     🍒 in the main file index.js, có app.use(express.json());
+                     🍒 in the routes>>index.js (the secondary index.js) 
+                         router.get('/invoice',(req,res,next)=>{
+
+
+                         })
+                         //You can add endpoint handler to some controller level, but in this tutorial, this is just fine 
+                     🍒 hook the  router up inside of our express server 
+                        const router=require('./router');
+                        app.use(router) 
+                        //ok we can use pdf 
+                     🍒 What I would suggest is that we make a new directory called service
+                        🍒🍒 a pdf service  called pdf-service.js
+                        🍒🍒 I want to have a logic of generating the pdf in a separate file 
+
+                     🍒 chạy http://localhost:3002/invoice 
+                        => thấy browser tự tải về pdf chunks, lắp ráp hoàn chỉnh và Foxit Reader đọc nó và mở lên
+                        => 💢 tuy nhiên không biên dịch được các thẻ HTML 
+
+                     🍒 THis is how you stream pdfs from express server with PDFKIT 
+                         On the fly (ngay lập tức) back to the client , without storing ot on the server's file system ! 
+            **** how to readFile pdf then send to browser to open it 
+                          
+         
+               ***** (pdfmake) https://www.npmjs.com/package/pdfmake  👉 https://www.youtube.com/watch?v=WOGs7qI-iNo
+                  👉 PDF document generation library for server-side and client-side usage in pure JavaScript.
+                  👉 pdfmake is based on a truly amazing library pdfkit 
+               ***** (html-pdf) https://youtu.be/NNh7rvDbfMc
+                  👉   Trang web của tác giả là https://freemediatools.com/
+                  👉 có 1 file .html thì có thể dùng cú pháp trên cmd để chuyển thành pdf (cùng với CSS trên trang html đó)
+                     Là thư viện rất mạnh , bạn có thể tùy chỉnh bất cứ HTML nào và chuyển sang pdf
+                     Vậy có hoạt động với hình ảnh làm hình nền không -> có , kích thước PDF đã tăng lên vì đã nhúng hình ảnh của một Internet URL tới hình trên internet
+                     Bạn có thể customize html theo ý bạn thích 
+                  👉 ỨNG DỤNG: tạo CV với htmlCSS --> pdf  
+               ***** (puppeteer library) https://youtu.be/llkkwRABN-s
+                  ****** https://www.youtube.com/watch?v=McYcAnauTQ8
+                  ****** https://www.npmjs.com/package/puppeteer
+                  ****** https://i.ytimg.com/an_webp/9VgghGKx_1c/mqdefault_6s.webp?du=3000&sqp=CM_52ZgG&rs=AOn4CLCqtZQ34tRoroxeyhjECuXpVwjuKw
+                     ( Google puppeteer to convert HTML to PDF )
+                  ****** 💎 (ưu tiên 1, nhưng Chromium download failed do no space left) https://youtu.be/iqv0xZgXtZw
+                     ******* npm install puppeteer --save
+                     ******* https://stackoverflow.com/questions/71006216/i-cant-install-puppeteer 
+
+               ***** (jsPDF) 
+                  ****** https://www.talentica.com/blogs/pdf-generation-using-nodejs/
+               ***** (pdf lib) 
+                  ****** https://youtu.be/0sfs0AGWU0g
+
+         *** Thực hiện pdf export:
+            **** controllers >> quanlychinhanh.controller.js   ✔️
+            **** const PDFDocument= require('pdfkit');  ✔️
+            **** const pdfDoc=new PDFDocument();   ✔️
+            **** EJS + dynamic server data / api data / database data = standard HTML ✔️
+              => 🍒 Kết quả : xuất thành công outputEmpCovidInfo.pdf không bị lỗi  ✔️
+            **** real and dynamic server (example: ordering) data  => PDF 
+            **** Note: bài giảng của Maximillian , https://youtu.be/BRJkW6Vr6yA
+               ***** projectRootFolder >> data >>invoices 
+               ***** tác giả muốn đặt tên file là duy nhất
+                    👉 const invoiceName= 'invoice-' + orderId + '.pdf' ;
+               ***** tác giả muốn file trên nằm trong thư mục invoices
+                    👉 const invoicePath= path.join('data','invoices',invoiceName) 
+                    🍒 Kết quả: Không cần manually tạo tay, chỉ cần đường dẫn trên là file pdf sẽ nằm trong thư mục invoices 
+               ***** tiếp theo, tác giả npm install --save pdfkit cho thư mục controllers >> shop.js  
+               ***** do pdfkit exposes to be a PDF document. Do đó đặt tên class là:
+                  👉  const PDFDocument= require('pdfkit');
+                  👉 tạo instance which is a 🎉Readable stream🎉
+                       const pdfDoc=new PDFDocument();
+               ***** Chú ý là từ lúc quy định nơi chứa file cho tới tạo thực thể pdfDoc đều diễn ra trong controllers>>shop.js trong hàm getInvoice 
+               ***** XỬ LÝ ĐỌC doc: yêu cầu doc pipe() its (stream) output to somewhere which is 🎉Writable Stream🎉 (nếu ta cho nó bất cứ nội dung gì) for 💙 creating a file or 💙 sending a response
+                  👉 to a file? 💙 creating a file 
+                     🍒 doc.pipe(fs.createWriteStream('file_x.pdf)) 
+                  👉 to HTPP response object? 💙 sending a response
+                     🍒 doc.pipe(res) 
+                  => trong bài giảng tác giả dùng cả 2 lệnh trên để pdf vừa có trên server file vừa gửi tới client . Trên cơ sở doc là Readable stream, nên có thể hòa vào các WriteStream như res 
+
+               ***** XỬ LÝ GHI doc: 
+                  👉add a single line of text into the doc ? use doc.text() 
+                     🍒 đơn giản nhất là doc.text("hello world"); 
+
+               ***** Finalize PDF file
+                  👉 at some point, you wanna KẾT THÚC xử lý ghi , you tell node when you are done writing/piping to stream 
+                  doc.end();
+                     🍒 Kết quả là : the file is saved and the HTTP response object is sent 
+ 
+               ***** Review 
+                  👉 https://youtu.be/uwakm2mGjVY
+                  🍒 cho biết doc.end() có thể đứng trước hay sau doc.pipe() cũng được, không quan trọng 
+                  🍒 you can use pipe to stream directly to a response , no need to create the file first then download it 
+                      doc.pipe(res);
+                  🍒 doc.write() is the line causing the trouble, which is also a deprecated method, so do not use it 
+                  🍒 Instead, use pipe to tell your doc where to stream the information, and remember to close it using doc.end() 
+
+
+
+         **** Assignment2_25 (Màn hình 1)
+               - thêm hình ảnh cho file pdf TokhaiCovidCanhan  ✔️
+                 👉 tham khảo imageForPdf.PNG  
+                 
+               -❤️ Chọn “Checkout” (aka "Kết thúc làm"), hiển thị thông tin (từ CSDL):
+                  🆒🆕 Ý tưởng: 
+                  Số giờ đã làm hôm nay. 
+                  Danh sách các lượt bắt đầu, kết thúc trong ngày kèm thông tin nơi làm việc 👉 Hàm find sẽ trả về một mảng (https://www.geeksforgeeks.org/how-to-get-data-from-2-different-collections-of-mongodb-using-node-js/)
+                  Chuyển sang trạng thái không làm việc.
+                  Cho phép kết thúc làm nhiều lần trong ngày.
+                  👉 tham khảo assignment1 
+
+                  ⏹ Implement:
+                     👉route:   //GET --> /nhanvien/checkout
+                                 router.get('/diemdanhra',checkLoginStatus.nhanvienIfLoggedIN,nhanvienController.getStaffCheckout);
+                     👉controller: 
+                           exports.getStaffCheckout
+                     👉view
+                           Phieu_checkout_nhanvien 
+                     👉schema: 
+                           〽️  recordedKetThucLam  
+
+                     😎 nhấn nút "Check me out" sẽ tới 
+
+                     👉 route POST --> /nhanvien/checkout
+                           router.post('/diemdanhra',checkLoginStatus.nhanvienIfLoggedIN,nhanvienController.postStaffCheckout);  
+                     👉 controller:
+                           exports.postStaffCheckout=(req,res,next)=>{
+                     👉 view --> không có 
+                        X.save()
+                         .then(result=>{
+                           console.log("save successful");
+                           res.redirect('/nhanvien/diemdanhvao');
+                         })
+}
+                  💢 Problem với recordedKetThucLam:
+                          //Cách 1:
+                              ///Danh_sach_cac_luot_batdau_ketthuc:[Luot_bat_dau_Luot_ket_thuc]
+                          //Cách 2:
+                          Danh_sach_cac_luot_batdau_ketthuc:{type:[Luot_bat_dau_Luot_ket_thuc],required:true}, //ReferenceError: Cannot access 'Luot_bat_dau_Luot_ket_thuc' before initialization, do đó Luot_bat_dau_Luot_ket_thuc phải đứng trước recordedKetThucLam
+                          //Kết luận: cả 2 cách trên đều không mở mảng trong MongoDb được
+
+                  💊 Assignment2_phan26 sẽ thử thêm dữ liệu theo Model.insert() https://stackoverflow.com/questions/46302053/mongoose-express-create-schema-with-array-of-objects
+                       => /// TypeError: SchemaPhieuCheckOutNhanvien.insert is not a function 
+                    
+                  
+                  
+                  💊 Assignment2_phan27 sẽ thực hiện giống collection orders của tác giả Maxi
+                     *** mục tiêu là phải tạo được mảng trong mongodb collection  ✔️
+                     *** MongoDB 👉 testMongoose >> orders 
+                        **** làm sao lưu products là Array chứa các đối tượng order items 
+                       
+                     *** Về schema: ✔️
+                        **** khai báo trực tiếp doc chứa array chứa objects schema là gì:
+                          const orderSchema = new Schema({
+                             products: [
+                               {
+                                 product: { type: Object, required: true },
+                                 quantity: { type: Number, required: true }
+                               }
+                             ],
+                             .... })
+                     *** Điều chỉnh lại Schema con sau:  
+                        const Luot_bat_dau_Luot_ket_thuc=new mongoose.Schema({  ✔️
+                            Luot_bat_dau:{type: String, required: true},
+                            Luot_ket_thuc:{type: String, required: true},
+                            Noi_lam_viec:{type:String,required: true},
+                            So_phut_phien_lam_viec:{type:Number, required: true}  //bỏ Thoi_gian_checkout_nhanvien_ghi:{type:String,required: true} trong recordedKetThucLam
+                        });
+
+                        //Lý do: các lần checkout tiếp theo:
+                           /// Tìm trong MongoDB 'ketthuclams' có nhanvien đó chưa, nếu có thì cập nhật bằng cách 👉 sẽ push đối tượng (Luot_bat_dau,Luot_ket_thuc,Noi_lam_viec,So_phut_phien_lam_viec) vào trong Mảng ✔️
+
+                           /// res.redirect('/nhanvien/diemdanhvao') //idea là checkout xong sẽ tới endpoint này có sẵn "Trạng thái hiện tại: Không làm việc" ✔️
+
+                     *** Thêm menu option "Day Summary" để tổng kết giờ làm và nơi làm của một nhân viên trong ngày   
+                        **** route
+                           /nhanvien/daySummary  ✔️
+                        **** controller 
+                           👉  exports.getDaySummary=(req,res,next)=>{
+                           👉  
+                     *** Tiếp theo
+                        **** Mục tiêu là Lượt làm việc tiếp theo, NV_x có nhu cầu thêm 1 đối tượng vào mảng Danh_sach_cac_luot_batdau_ketthuc ✔️
+                        **** find và trả về mảng thỏa JSON object filter,
+                        **** https://www.geeksforgeeks.org/mongodb-findone-method/  trả về đối tượng đầu tiên thấy trong MongoDB
+                           ***** findOne nhanvien với {id: nhanvienId}
+                             => trả về 1 đối tượng Javascript 
+                             💡 Thử save() một thuộc tính mới vào đt này, xem MongoDB có cập nhật không  , cơ sở lý thuyết là Mongoose giúp JS object có liên quan với collection trên MongoDB 
+                                 👉 https://stackoverflow.com/questions/14619793/how-to-add-an-attribute-to-an-existing-document-with-mongoose
+                                 👉   Use the db.collection.save() to update an existing document or inserts a new document, nhưng ở đây đang dùng Mongoose 
+                        **** Maximillian
+                              Product.findById(productId)
+                                .then(product=>
+                                 // sau khi cập nhật thuộc tính nào đó thì product.save()  ✔️
+
+                        **** plan là push object vào mảng Danh_sach_cac_luot_batdau_ketthuc ✔️
+                           ***** Khi findOne 
+                              👉  tìm ra doc thì truy cập mảng rồi push đối tượng mới vô ; So_gio_da_lam_hom_nay= So_gio_da_lam_hom_nay + newHours ✔️
+                           ***** Khi https://mongoosejs.com/docs/tutorials/findoneandupdate.html
+                              ****** You should use save() to update documents where possible, but there are some cases where you need to use findOneAndUpdate()
+                                
+
+                     *** 🎁 Assignment2_28
+                         1/ -❤️ Đăng ký nghỉ phép
+                               
+                             👉 1.1/ Chọn ngày (chọn được cả ngày trong quá khứ, cho phép chọn nhiều ngày).
+                             1.2/ Lý do.
+                             Hiển thị thông tin số ngày còn lại (không thể chỉnh sửa).
+                             Nếu số ngày annualLeave còn lại là 0 thì thông báo và không cho phép đăng ký.
+                             Chọn số giờ sẽ nghỉ (tối đa 8h cho mỗi ngày), số giờ sẽ nghỉ phải nhỏ hơn số ngày annualLeave còn lại (mỗi ngày annualLeave = 8h). Lúc nhập xong hệ thống sẽ hiển thị quy đổi ra là bao nhiêu ngày, ví dụ 4h thì hiện là 0.5 ngày.
+                             Đăng ký xong thì trừ vào vào số ngày annualLeave còn lại. Số ngày annualLeave này không bao giờ mất đi nếu không dùng đến, mỗi năm admin sẽ tiến hành add thêm annualLeave bằng một hệ thống khác.
+                            
+
+                             👉 điều kiện là annualLeave > 0 . Nếu = 0 thì không được đăng ký nghỉ phép
+                             **** router
+
+                                 ***** //GET --> /nhanvien/dangkynghiphep
+                                      router.get('/dangkynghiphep',checkLoginStatus.nhanvienIfLoggedIN,nhanvienController.getPhieuNghiPhep); ✔️
+                                 
+                                 ***** //POST --> /nhanvien/dangkynghiphep
+                                      router.post('/dangkynghiphep',checkLoginStatus.nhanvienIfLoggedIN,nhanvienController.postPhieuNghiPhep);
+                                      👉 (khi gửi array các date and hour để đăng ký nghỉ phép) https://stackoverflow.com/questions/42610022/receive-form-data-in-an-array-in-node-js-using-express
+                             **** controllers
+                             **** view "phieunghiphep"✔️
+                                ***** HTML multiple select with checkbox https://estradawebgroup.com/Post/How-to-implement-multiple-selection-with-check-boxes-in-an-HTML-select-control-using-jQuery/4231
+                                ***** https://demo.mobiscroll.com/angular/calendar/multiple-select#
+
+                             **** schema "phieunghiphep"
+                                 ***** thêm thuộc tính sau cho nhanvien
+                                    annualLeave:{   ✔️
+                                        type:Number,
+                                        min:0,
+                                        max:12
+                                    },
+                                    => thêm annualLeave cho các nhân viên trong CSDL  ✔️
+
+                              **** https://youtu.be/LHzqNLaVhYw  (jquery date picker)
+                              **** https://adnan-tech.com/calculate-difference-between-2-dates-jquery/
+                              **** https://stackoverflow.com/questions/29119009/choose-multiple-dates-in-date-input-in-html
+                              **** ❤️ http://dubrox.github.io/Multiple-Dates-Picker-for-jQuery-UI/
+                                => 💊 https://github.com/dubrox/Multiple-Dates-Picker-for-jQuery-UI/
+
+                              **** ❤️ https://www.npmjs.com/package/mui-multiple-dates-picker
+                              **** https://youtu.be/rMwJQLsnyQo (How to implement multiple date selection in jQuery)
+
+                        *** 🎁 Assignment2_29
+
+                        1/ trong 2_28 thì name"  []" không được nhận là array (false)
+                           => trong 2_29 sẽ sửa điều này trong 2 files dangkynghiphep.js và dangkynghiphep.ejs   
+                                 const phieunghiphepSchema=new mongoose.Schema({   ✔️
+                           **** cho phép chọn nhiều ngày ✔️
+                           **** Hiển thị thông tin số ngày còn lại (không thể chỉnh sửa).✔️
+                           **** Nếu số ngày annualLeave còn lại là 0 thì thông báo và không cho phép đăng ký (như NV_2)
+                              => cả case annualLeave=0 hay >0 thì diable a button with HTML and CSS : https://lifeincoding.com/how-to-disable-button-with-css/ ✔️ (một cách phá hủy sự async: When the details are not yet entered by the user then clicking the button is of no use so it can be kept disabled.)
+                           **** Bẫy: Model.save is not a function  => phải tạo instance của Model mới gọi save() được ✔️
+                           **** đã lưu phieunghiphep vào csdL✔️
+                           **** 💢 Chọn số giờ sẽ nghỉ (tối đa max= 8h cho mỗi ngày), số giờ sẽ nghỉ phải nhỏ hơn số ngày annualLeave còn lại (mỗi ngày annualLeave = 8h). Lúc nhập xong hệ thống sẽ hiển thị quy đổi ra là bao nhiêu ngày, ví dụ 4h thì hiện là 0.5 ngày.
+                               => nếu annualLeave còn lại là 0.2 ngày (hay 4.8h) thì tổng h nghỉ cho n ngày phải < 4.8h ✔️
+                           **** 💢 mỗi khi nhập một số thì sum tự tăng lên, xóa một số thì sum tự giảm ✔️
+                               => 👉 https://stackoverflow.com/questions/13540751/how-get-total-sum-from-input-box-values-using-javascript
+                                https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/isNaN
+                                https://www.urbandictionary.com/define.php?term=nbsp 👉 "&nbsp;" is the HTML encoding for a non-breaking space, which is a space that doesn't get removed by the browser on rendering.
+                           **** jquery tiếp cận content of HTML: <span id="sum" style="font-weight: bold;background-color:yellow">0</span> thì $("#sum").html(sum.toFixed(2)); ✔️
+                           **** jquery get and set input's value với hàm val(): https://www.geeksforgeeks.org/how-to-get-the-value-in-an-input-text-box-using-jquery/ ✔️
+                           **** https://stackoverflow.com/questions/52404681/how-to-check-value-of-input-is-greater-than-12-in-jquery-using-if-statement ✔️
+
+                           **** Demo nộp đơn xin nghỉ phép lên CSDL ✔️
+
+                        2/ ❤️ upload để cập nhật hình ảnh avartar của nhan vien 
+                         ***** Chuẩn bị
+                           ✍️ tạo "uploadAvatarNhanvien" là nơi chứa hình upload của nhân viên trong file (với engine diskStorage())
+                              => nằm trong public/images để có thể serve statically bởi Express server (server sử dụng thư viện Express) ?? Không cần hơn nữa security lộ trên mạng , để chỗ nào multer cũng tìm được path, nếu để trong static folder thì lộ đường dẫn 
+                                 Bài của Maxi không dùng public để truy cập hình trong URL 
+                           ✍️ lưu path nằm trong req.file which is created by multer vào trong MongoDB 
+                              => muốn hiển thị (display) hình thì chỉ cần ejs đường dẫn tuyệt đối này vào thuộc tính src=" "
+                              => do hình lúc nào cũng tạo mới rồi lưu trong file --> không cần ghi đè hình cũ , dù upload hình cũ nhưng tên file khác nhau luôn luôn 
+                           ✍️ xem Lab10.28: exports.postEditProduct = (req, res, next) => {    
+                              => cập nhật imageUrl trên MongoDB bằng instance.save() , lúc đó src sẽ nhận dữ liệu động từ người dùng để tới chỗ có hình ảnh, rồi Express render EJS chỗ đó để hiển thị 
+                              🧡 //Thêm field sau cho nhanvien.schema.js ✔️
+                                 imageMulterPath: {
+                                     type: String,
+                                     required: true
+                                 }
+                              🧡 nhanvienProfile.ejs ✔️
+                                 <form enctype="multipart/form-data" method="POST" action="/nhanvien/view_personal_profile">
+                                    <input id="empAvatar" type="file" class="form-control" name="empAvatar"/>
+                                    <input type="submit" class="btn btn-success" value="Upload Avartar">
+                                 </form>
+
+                              🧡 npm install --save multer ✔️
+                              🧡 Trong index.js: 
+                                 **   const multer= require("multer") ✔️
+                                 **   app.use(multer().single('empAvatar')); ✔️
+                                 **   yêu cầu multer chuẩn bị (setup) storage engine
+                                    *** app.use(multer({storage}).single('empAvatar'));
+                                 **  set up diskStorage bằng cách gán hàm fileStorage vào keyword storage✔️
+                                    *** app.use(multer({storage:fileStorage}).single('empAvatar')); ✔️
+
+                                 ** add a filter to multer to only allow certain kinds of files, bằng cách gán hàm fileFilter vào keyword fileFilter
+                                    *** trong hàm multer(), thêm property fileFilter
+
+                              🧡 Demo thấy multer hoạt động tốt  
+                                 -> tạo các image files vào thư mục uploadAvatarNhanvien ✔️
+
+                                 ** tiếp, tạo controller để nhận var binaryData= req.file.empAvatar;
+                                    *** POST req tới /nhanvien/view_personal_profile
+                                    *** console.log(req.file) //xem các originalname, fieldname
+
+                              🧡💢 PROBLEM: nhưng path của multer có public đứng trước. Do đó giải pháp là ❤️ cho nhanvienProfile.ejs này vào 1 thư mục cấp dưới 1 bậc của view, lúc đó có thể paste multer's path vào src-->
+                                 => Assignment2_phan30
+                                    *** cho nhanvienProfile.ejs vào thư mục nhanvien , thuộc views  ✔️
+                                    *** vào nhanvienProfile.ejs để xem img có src chứa public chạy được không
+                                    *** 🔑chìa khóa là: app.use('/public',express.static(path.join(__dirname, 'public'))); //tuy nhiên dòng này works
+                           
+                           
+                       
+
+                           ✍️ xem appLTV: 
+                              💙<form action="/Nhan_vien/Chon_chuc_nang" method="get" style="width:200px" class="btn">
+                                    <input type="hidden" value="Cap_nhat_Hinh" name="Th_Ma_so_chuc_nang" />
+                                    <input name="Th_Ma_so_Nhan_vien" value="${Nhan_vien_dang_login.Ma_so}"  type="hidden" />
+                                    <button type="submit" class="btn btn-dark">
+                                        Cập nhật<br/>Hình
+                                    </button>
+                                 </form>
+
+                              💙 if(Ma_so_Chuc_nang=="Cap_nhat_Hinh"){
+                                    Chuoi_HTML+=XL_3L.Tao_Chuoi_HTML_Chuc_nang_Cap_nhat_Hinh(Nhan_vien_dang_login)
+
+                              💙 Tao_Chuoi_HTML_Chuc_nang_Cap_nhat_Hinh(Nhan_vien_dang_login){
+                                     var Chuoi_HTML=""  //định nghĩa chuỗi không dùng Template Literal
+                                     //trong accept không có jpg thì browse sẽ không có rock.jpg
+
+                                     //định nghĩa chuỗi dùng Template Literal:
+                                     Chuoi_HTML=`
+                                          <form action="/Thuc_hien_chuc_nang" method="POST" enctype="multipart/form-data">
+                                                    <div class="alert" style="height: 20px;">Cập nhật Hình của ${Nhan_vien_dang_login.Ho_ten}</div>
+                                                    <div class="alert" style="height: 20px;">
+                                                        <input type="hidden"  name="Th_Thuc_hien_Chuc_nang" value="Cap_nhat_Hinh" >
+                                                        <input type="file"  name="Th_cap_nhat_Hinh" accept="image/png/jpg" > 
+                                                    </div>    
+                                                    <div class="alert" style="height: 20px;">
+                                                         <button class="btn btn-success">Đồng ý</button>
+                                                    </div>
+                                           </form>
+                                     `
+                                     return Chuoi_HTML
+                                 }
+
+                              💙  app.post('/Thuc_hien_chuc_nang',(req,res)=>{
+                                     if(Thuc_hien_Chuc_nang=='Cap_nhat_Hinh'){
+                                         //============Biến nguồn
+                                         var Tap_tin_Hinh= req.files.Th_cap_nhat_Hinh  //When you upload a file, the file will be accessible from req.files
+                                         var Du_lieu_tap_tin_hinh=req.files.Th_cap_nhat_Hinh.data
+                                         //============Kết xuất
+                                         XL_3L.Ghi_Hinh_Nhan_vien(Nhan_vien_dang_login, Du_lieu_tap_tin_hinh) 
+
+                              💙    Ghi_Hinh_Nhan_vien(Nhan_vien_dang_login, Tap_tin_Hinh){
+                                       var Path=`../Media/${Nhan_vien_dang_login.Ma_so}.png`
+                                       //ghi đè vô file hình hiện tại (VD NV_1.png). Chứ không tự động tạo tên file mới
+                                       FS.writeFileSync(Path,Tap_tin_Hinh)  //Tap_tin_Hinh là phần data truyền tới. Tại NV_1.png, dữ liệu file này ban đầu là hình của Bành Khuê sẽ được thế là hình của Batista (NV_1.png) , không thế bằng rock.jpg được  
+                                    }
+
+                              🧡🧡 Nhược điểm: ghi đè hình mới lên hình cũ , làm mất hình 
+                              🧡🧡 Khắc phục: lưu reference trên MongoDB tới từng unique hình, hình mới sẽ tạo mới trên server mà vẫn giữ hình cũ
+                            
+                            
+                        ***🎁 Assignment2_phan30
+
+                                 🍒 Solution:
+                                    <img style="width:28rem;padding-top:2rem" src="\public\userUploadAvatar\r.png" alt="r with virtual prefix \public"> <!--anh này có thể dynamic với multer path-->
+                                    <img style="width:28rem;padding-top:2rem" src="/public/userUploadAvatar/r.png" alt="r with virtual prefix /public"><!--anh này có thể dynamic với multer path-->
+                                    <img style="width:28rem;padding-top:2rem" src="\..\..\public\userUploadAvatar\r.png" alt="r absolute/relative path" > <!--anh này chứng minh trong index.js không cần app.use('/public',express.static(path.join(__dirname, 'public'))); 👉 xem Assignment2_phan31-->
+                                    <img style="width:28rem;padding-top:2rem" src="/userUploadAvatar/r.png" alt="r from static folder public" > <!--❤️ anh này tuy ok, nhưng dynamic được với multer path vì multer path có chữ public đứng prefix-->   
+
+
+                        ***🎁 Assignment2_phan31
+                           **** bỏ đi app.use('/public',express.static(path.join(__dirname, 'public'))); //Không bỏ được vì nó phối hợp với img sau đây: ✔️
+                           **** dùng <img style="width:28rem;padding-top:2rem" src="\..\..\public\userUploadAvatar\r.png" alt="r absolute/relative path" > <!--anh này chứng minh trong index.js không cần app.use('/public',express.static(path.join(__dirname, 'public'))); 👉 xem Assignment2_phan31-->  ✔️
+                           **** Demo đã upload được ảnh cho 7 nhân viên 
+                              ***** instance.save() tự động thêm thuộc tính vào MongoDB mà không cần manually viết vào trong MongoDB  ✔️
+                              ***** bản thân Math.random() không tạo được security, nên phải điều chỉnh theo npm multer   ✔️
+                           **** Demo thử thay đổi NV_1.png thành nhanvienAlien.PNG ✔️
+                               => perfect ✔️
+                           **** 💢 bị run out of space vì các file ảnh quá nhiều trong các folder --> đem ra riêng 1 folder khác 
+                               => vẫn update hình perfectly ✔️
+                           **** Day summary nhưng không tìm ra phiếu nào. Có 2 lý do  ✔️
+                              ***** với tên nhân viên hợp lệ, anh này chưa checkout nên chưa có phiếu 
+                              ***** 👉 tên nhân viên không hợp lệ (VD trong nhanviens thì "Bành đình thụy khuê" nhưng trong ketthuclams là có whitespace "Bành đình thụy khuê ", lỗi này hay gặp khi manually nhập), tạo ra inconsistent Ho_ten giữa 2 bảng ✔️
+
+                        ***🎁 Assignment2_phan32      
+                           **** đã sửa problem về reduce() mảng khi tính Tong ket day cho nhan vien  ✔️
+                           **** khi lên Heroku thì không Log in được
+                           **** Possible solutions
+                              ***** https://stackoverflow.com/questions/70295250/node-js-app-is-not-working-after-deploying-to-heroku
+                              ***** app.listen(process.env.PORT || 8080, '0.0.0.0' ,{}=>{
+                                       console.log("Server is running");
+                                    }) // "0.0.0.0" là địa chỉ IP của MongoDB cho pháp access from averywhere 
+                              ***** https://stackoverflow.com/questions/56777088/unable-to-connect-to-mongodb-database-with-my-heroku-app
+                              
+                              
+
+
+
+
+                         ***** Quyền hạn: nhân viên chỉ có thể sửa Image (có thể chỉnh sửa bằng cách upload file)
+                         ***** Yêu cầu: Các chức năng ở màn hình MH-2 hoạt động đúng yêu cầu: Yêu cầu đăng nhập nếu chưa đăng nhập. Có thể thay đổi hình ảnh bằng cách upload file.
+                         ***** upload hình vào server 
+                            **** https://youtu.be/fACSczNshtI  (tiếng việt)
+                            **** https://youtu.be/NNh7rvDbfMc  
+                            **** https://i.ytimg.com/an_webp/myLWWN2dCIw/mqdefault_6s.webp?du=3000&sqp=CMTs25gG&rs=AOn4CLD1CXVojvqtdLlvzsFDVprOVEopZw                   
+
+                         ***** Tham khảo appLTV: 
+                           ****** <form action="/Nhan_vien/Chon_chuc_nang" method="get" style="width:200px" class="btn">
+                                      <input type="hidden" value="Cap_nhat_Hinh" name="Th_Ma_so_chuc_nang" />
+                                      <input name="Th_Ma_so_Nhan_vien" value="${Nhan_vien_dang_login.Ma_so}"  type="hidden" />
+                                      <button type="submit" class="btn btn-dark">
+                                          Cập nhật<br/>Hình
+                                      </button>
+                                  </form>
+
+                           ****** <form action="/uploadphoto" enctype="multipart/form-data" method="POST">
+                                      <input type="file" name="myImage" accept="image/*">
+                                      <input type="submit" value="Upload Photo">
+                                  </form>
+                                  👉https://codedec.com/tutorials/image-uploading-to-mongodb-in-nodejs/
+
+                           ****** <form action="/action_page.php">
+                                      <label for="img">Select image:</label>
+                                      <input type="file" id="img" name="img" accept="image/*">
+                                      <input type="submit">
+                                  </form>
+                                  
+                                  👉  https://www.w3schools.com/TAGS/att_input_accept.asp => The accept attribute specifies a filter for what file types the user can pick from the file input dialog box.
+                                  👉  Note: The accept attribute can only be used with <input type="file">.
+                                  👉  Tip: Do not use this attribute as a validation tool. File uploads should be validated on the server.  
+                                  👉  client validation: <input accept="file_extension|audio/*|video/*|image/*|media_type">
+
+                           ****** "express-fileupload" vs "multer"
+                              ******* https://www.npmjs.com/package/express-fileupload
+                                 👉 const file_uploader=require('express-fileupload') 
+                                 👉    app.use(file_uploader())
+                                 👉 Simple express middleware for uploading files.
+                                    
+                                    <form ref='uploadForm' 
+                              			id='uploadForm' 
+                              			action='/upload' 
+                              			method='post' 
+                              			encType="🍒 multipart/form-data">   <!--enctype cũng ok-->
+                              			🍒	<input type="file" name="sampleFile" />
+                              				<input type='submit' value='Upload!' />
+                              		</form>		
+
+                                 👉 When you upload a file, the file will be accessible from req.files
+                                     app.post('/upload', function(req, res) {
+                                          console.log(🍒req.files.foo); // the uploaded file object
+                                     });
+
+                                 👉   VD trong appLTV: CHỈ CÓ UPLOAD FILE, chứ không upload text đồng thời với file
+
+                                    Tao_Chuoi_HTML_Chuc_nang_Cap_nhat_Hinh(Nhan_vien_dang_login){
+                                          var Chuoi_HTML=""
+                                          //trong accept không có jpg thì browse sẽ không có rock.jpg
+                                          Chuoi_HTML=`
+                                              🍒 <form action="/Thuc_hien_chuc_nang" method="POST" enctype="multipart/form-data">
+                                                         <div class="alert" style="height: 20px;">Cập nhật Hình của ${Nhan_vien_dang_login.Ho_ten}</div>
+                                                         <div class="alert" style="height: 20px;">
+                                                             <input type="hidden"  name="Th_Thuc_hien_Chuc_nang" value="Cap_nhat_Hinh" >
+                                                            🍒 <input type="file"  name="Th_cap_nhat_Hinh" accept="image/png/jpg" > 
+                                                         </div>    
+                                                         <div class="alert" style="height: 20px;">
+                                                              <button class="btn btn-success">Đồng ý</button>
+                                                         </div>
+                                                </form>
+                                          `
+                                          return Chuoi_HTML
+                                    }
+
+
+                                    🍒 app.post('/Thuc_hien_chuc_nang',(req,res)=>{
+                                          if(Thuc_hien_Chuc_nang=='Cap_nhat_Hinh'){
+                                             var Du_lieu_tap_tin_hinh=req.files.Th_cap_nhat_Hinh.data
+
+                                    🍒 XL_3L.Ghi_Hinh_Nhan_vien(Nhan_vien_dang_login, Du_lieu_tap_tin_hinh)
+                                    🍒 Ghi_Hinh_Nhan_vien(Nhan_vien_dang_login, Tap_tin_Hinh){
+                                           var Path=`../Media/${Nhan_vien_dang_login.Ma_so}.png`
+                                           🍒 FS.writeFileSync(Path,Tap_tin_Hinh)  //Tap_tin_Hinh là phần data truyền tới. Tại NV_1.png, dữ liệu file này ban đầu là hình của Bành Khuê sẽ được thế là hình của Batista (NV_1.png) , không thế bằng rock.jpg được  
+                                       }
+
+
+                              ******* Use temp files instead of memory for managing the upload process
+                                   // Note that this option available for versions 1.0.0 and newer. 
+                                 👉   app.use(fileUpload({
+                                           useTempFiles : true,
+                                           tempFileDir : '/tmp/'
+                                       }));
+
+                              ******* VẬY express-fileupload có xử lý mixed data (file+text) như multer không ?? 
+                                 👉 https://stackoverflow.com/questions/64803772/nodejs-fileupload-multer-vs-express-fileupload-which-to-use
+                                    + Base64 or Multipart? 
+                                    + Multipart is a way to upload data to server in the form of part which are in bytes. Multpart/form-data is applied to a form though, so you can send everything in a multi-part form, including "regular" data also.
+                              *******👉 https://sebhastian.com/express-fileupload/ 
+
+                           ***** $.ajax file upload
+
+                              ******* https://codeforgeek.com/ajax-file-upload-node-js/ 👉 need jquery.form
+
+                           ***** express-fileupload 
+                              ******* môn NMCNPM appLTV 
+                              ******* https://youtu.be/hyJiNTFtQic
+
+                           ***** multer  (https://www.npmjs.com/package/multer)
+                              ******* (article) https://afteracademy.com/blog/file-upload-with-multer-in-nodejs-and-express
+                              ******* (Tiếng Việt) https://youtu.be/rEV3OYFsUWw
+                                 👉    lưu tên file ảnh với Date.now() hay Math.round(Math.random()*1E9)
+                                 👉    diskStorage
+                              ******* ❤️ Special case: https://youtu.be/zyHkexA4ZBw  👉 update user profile image with multer express mongoose 
+                              ******* (nâng cao: lưu hình trong database dưới dạng binary )https://stackoverflow.com/questions/67083436/mongodb-multer-how-do-i-convert-a-buffer-binary-to-an-image
+                              ******* (binary buffer to stream) https://github.com/expressjs/multer/issues/797
+                              ******* https://gist.github.com/bbottema/390852735943edecc9f1
+                              ******* ✅ https://codedec.com/tutorials/image-uploading-to-mongodb-in-nodejs/
+                              ******* https://www.tabnine.com/code/javascript/functions/multer/File/buffer
+
+                           ***** Binary data, Stream, Buffer
+                              👉 https://dev.to/areknawo/node-js-file-streams-explained-535e
+                              👉 https://dev.to/aws-builders/things-to-know-before-streaming-data-4h5m
+                              👉 https://dev.to/ali_a_koye/simplest-uploader-creating-powerful-nodejs-object-uploader-359o
+                              👉 https://dev.to/lokosama/node-js-upload-binary-image-on-the-fly-with-fastify-and-cloudinary-5c1h    
+                              👉 https://www.lifewire.com/how-to-avoid-buffering-issues-1847399
+                              👉 https://www.geeksforgeeks.org/streaming-stored-video/
+                              👉 https://stackoverflow.com/questions/45805890/node-multer-memory-storage-how-to-release-memory
+                              👉 https://www.digitalocean.com/community/tutorials/using-buffers-in-node-js
+
+                              ******* https://expressjs.com/en/resources/middleware/multer.html
+                              ******* is primarily used for uploading files
+                              ******* NOTE: Multer will not process any form which is not multipart (multipart/form-data) 
+                                    <form action="/profile" method="post" enctype="multipart/form-data">
+                                          <input type="file" name="avatar" />   //giống lúc làm express-fileupload
+                                    </form>
+ 
+
+                     
+
+
+
+
+
+           
+          
+         
+          
+         
+         
+         
+         
+         
+         *** CSRF attack
+            **** cho các form POST , còn nói chung thì view ??
+            **** https://security.stackexchange.com/questions/90023/get-and-post-request-vulnerable-to-csrf-attack
+            **** https://www.geeksforgeeks.org/what-is-cross-site-request-forgery-csrf/
+            **** https://www.fullstackgeeks.com/cross-site-request-forgery/
+            **** https://owasp.org/www-community/attacks/csrf
+
+
+      ** exports.postSignup=(req,res,next)=>{
+    console.log("admin postSignup here, begin to process user input on server");
+    //nhận dữ liệu user input và errors collection từ express-validator
+    //nếu có lỗi thì báo msg "Passwords have to match!" ngay tại trang form sign up luôn, không báo sau khi redirect lới admin/login
+        ///"Passwords have to match!" là từ express-validator, vậy làm sao view xử lý hiển thị ra HTML?
+        ///errorMessage: errors.array()[0].msg, //đây là điều kiện để hộp báo lỗi hiện lên
+    const expressValidationErrors=validationResult(req);
+
+    if (!expressValidationErrors.isEmpty()) {
+        console.log(expressValidationErrors.array());
+    
+        //🍽 re-render the previous view (xử lý hiển thị view lần trước , cũng là yêu cầu ASM2 ) ✔️
+        return res.status(422).render('auth/signup', {
+
+      ** MemoryStore: Dù không designed cho production,
+         *** admin's getSignup, đã truy cập thành công sesssion data từ MemoryStore  ✔️
+            **** Register LyVietKhang from VietNam
+         *** sau khi login thành công, tiếp tục dùng MemoryStore lưu user vào session để làm middleware
+               // middleware to test if authenticated
+               function isAuthenticated (req, res, next) {
+                     if (req.session.user) next()
+                     else next('route')
+               }
+
+      ** MongoStore
+         *** Không dùng MemoryStore để lưu session trên RAM memory (sẽ mất thông tin nếu server down mất điện vì temporary thôi)
+            **** trang getSignup của admin, thử truy cập tên admin và country trong MemoryStore
+               ***** how? https://www.npmjs.com/package/memorystore
+               ***** http://expressjs-book.com/index.html%3Fp=128.html
+                  ******* Express comes with a built-in SESSION store called MemoryStore, which is the default when you don’t specify one explicitly.
+                  ******* MemoryStore uses the application RAM for storing session data and works right out of the box, without the need for any DATABASE
+               ***** express-session full-featured MemoryStore module without leaks!
+         *** admin.schema.js ✔️
+            **** adminSchema=new mongoose.Schema() 
+            **** module.exports=adminSchema 
+         *** admin.models.js ✔️
+            **** module.exports=mongoose.model("tên model", adminSchema);
+         *** router.get('/register', adminController.getSignup);  ✔️
+         *** exports.postSignup=(req,res,next)=>{
+    
+         }
+
+         **** tại admin's postSignup: thu thập 3 thông tin sau
+            ***** trước khi tới postSignup controller, thực hiện validate confirmingPassword
+               ***** input từ ô tên "password2"
+            ***** {email,password}=req.body;   //với admin thì Ten_Dang_nhap là lyvietkhang và Mat_khau là 123456 đã lưu trong file .env
+               ***** các input từ ô tên "username" và "password"
+            ***** const errors = validationResult(req);
+            ***** router.post('/register',validate,adminController.postSignup);
+ 
+         **** sau đó
+               const user = new Admin({
+                     /// theo tiêu chuẩn của schema
+                 });
+               return user.save(); //lưu vào MongoDB 
+
+         **** signup thành công thì res.redirect('/login'); 
+
+      ⚽️ sau khi đăng ký username và password admin, sau đó login 
+         //**** authentication.controller.js 
+         //**** authentication.route.js 
+         **** authentication.view.js (login, signup, reset, new-password) => không cần, vì nó sẽ đồng cấp với thư mục Layouts
+         ⁉️⚠️ Tuy nhiên , các authentication trên nhằm vào Loại đối tượng Con người nào? (Admin? quanlychinhanh? nhanvien? khachthamquan?)
+            =>💜 câu trả lời là cho ai (shopper hay admin) cũng được, miễn là lấy được input (đã trải qua vòng validate chưa cần biết có error hay không) thì Model sẽ tương tác với CSDL 
+         **** ở ASM2 này credentials của admin có 2 facts lưu trên CSDL: Ten_dang_nhap, Mat_khau (không cần Role như dự án mẫu vì ở đây có các collection khác nhau)
+
+         **** nhớ validation thông tin admin nhập vào server (thứ nhất là cho thông tin trên CSDL phải thống nhất định dạng, thứ hai là bảo mật không cho hacker lỗ hổng để khai thác)
+            ***** npm install --save express-validator ✔️
+
+            ***** thực hiện express validation tại tầng Router (thư mục routes)
+               const {body} =require('express-validator/check'); 👉 body('Ten_dang_nhap') chain, body('Mat_khau') chain 
+               body('Ten_dang_nhap')  phải từ 6 ký tự trở lên . Không cần hash, mà sẽ in hoa tất cả khi vào csdl với body('Ten_dang_nhap').isUppercase().message("Toàn bộ mật khẩu phải in hoa")
+         ****⚠️  https://expressjs.com/en/resources/middleware/session.html
+
+         
+
+      ⚽️ getLogin  
+      *** Login thành công, thì session is established and is managed inside session store là:
+         **** MongoStore 👉  http://expressjs-book.com/index.html%3Fp=128.html
+
+         ****  https://expressjs.com/en/resources/middleware/session.html
+             //  middleware to test if authenticated
+               function isAuthenticated (req, res, next) {
+                 if (req.session.user) next()
+                 else next('route')
+               }
+            => như vậy session chỉ cần lưu thông tin của người dùng là  user , không cần isLoggedIn 😃
+
+         
+      *** 2 lựa chọn  👈 Chọn cả 2 (vì đề gợi ý admin sẽ đăng ký cho từng người, manually nhập dữ liệu trực tiếp lên MongoDB, nhưng 1 người dùng có thể tự đăng ký cho mình)
+         **** admin sẽ add tất cả nhanvien + quanly vào MongoDB  
+            ***** như trước kia admin sẽ postAddProduct với các thông tin required trong Model
+         **** để họ tự register  (oh, nhiều thông tin lắm, VD kèm Role, SP có kèm userId lấy từ session. GIỐNG NHƯ 1 View nhận dữ liệu )
+         => admin đăng ký thông tin cho QL chi nhánh, cho họ mật khẩu luôn (lúc sau có thể tự đổi lại với tính năng Reset Password) 
+            ***** tạo Schema cho QL chi nháh
+         => QLChi nhánh chỉ việc Log in bằng username và password thôi 
+
+
+      *** getDashboard
+
+   ** Sau khi có admin trên MongoDB, tiếp theo admin sẽ cấp quyền truy cập cho quanlychinhanh với username và password
+   
+   ✅ quanlychinhanh
+      ⚽️ Login,Register ✔️
+      ⚽️ Employee Covid 19 ✔️
+      ⚽️ Statistics   ✔️
+
+
+
+- Chức năng:
+   ** admin --> /addPersona (thêm/xóa nhanvien, thêm quanly)
+
+- views  ✔️
+   <%- include('../includes/head.ejs') %>
+      <link rel="stylesheet" href="/css/index.css">
+      <link rel="stylesheet" href="/css/login.css">
+      <link rel="stylesheet" href="/css/footer.css">
+      </head>
+  
+      <body>
+         <%- include('../includes/navigation.ejs') %>
+         <main>
+
+   => với cách này , cho phép "customize css" style cho từng "view chunk"
+
+- Don't have an account? <span> <a href= "<%= `/${role}` %>/register" >👉 Register </a></span>  ✔️
+
+- Yêu cầu đăng nhập (không cần đăng ký)
+  ** Chỉ có đăng nhập, không có đăng ký, thông tin về người dùng được nhập trực tiếp vào database
+  ** Đăng nhập xong thì quay lại trang trước đó, nếu không có trang trước đó thì quay về trang chủ.
+  ** Hiện nút cho phép đăng xuất sau khi đăng nhập thành công (với password và email)
+
+- Chức năng logout (hiện ra sau khi đăng login thành công với email và password)
+  ** nhanvien 
+  ** quanly
+  ** admin
+  

@@ -1,0 +1,82 @@
+<%- include('../views/layouts/khuc_dau.ejs') %>
+<%- include('../views/layouts/header.ejs') %> <!-- nếu có lỗi Invalid regular expression: missing / ngay tại http://localhost:3002/ là biết controller đã gửi thiếu gì đó cho view index-->
+        
+        <div class="container">
+            <div>
+                <h1 class="index_title w3-orange" style="font-family: Amita; font-size:3rem">Thông tin covid của nhân viên </h1>
+            </div>
+            
+
+            <!--định dạng CSS thông điệp tương tự view register và login_mobile_w3css-->
+            <% if(message){%> 
+                <div class="directMessage w3-panel w3-pale-green user-message user-message--error">
+                    <%= message  %>
+                </div>
+            <%}%>
+            
+                <!--bootstrap row phải nằm trong class container-->
+                <!-- xem  lại môn web1 để chọn lựa cách hiển thị bao nhiêu hình trên một dòng -->
+                <div class="container">
+                    <div class="row">
+                        <!--https://stackoverflow.com/questions/63881085/having-4-columns-in-a-row-with-boostrap-->
+                        <!--https://stackoverflow.com/questions/46810713/how-to-display-table-using-handlebars-with-array-of-object-->
+                         <!-- dùng loop để duyệt mảng các nhân viên, và hiển thị lên col-4 nghĩa là 1 hàng 3 col cho các thiết bị nào cũng được. Khi 1 hàng đủ 3 SP thì xuống dòng mới-->
+                        <%  if(employees.length>0) { %>
+                            <!--OK, check xem mảng có rỗng hay không. Nếu không thì xuất ra "Xin lỗi, Không có nhân viên nào"-->
+                            <!-- Thông thường sẽ check if(employees) nhưng tác giả quan tâm rỗng hay không-->
+                            
+                            <% for (let nv of employees) { %>
+                                <div class="col-sm-4" style="padding:0.5rem !important;margin-top:6rem"> <!--col-4 không có tác dụng-->
+                                    <!--với col-sm-4 thì mỗi dòng 3 items, nếu trong mobile sẽ tự động stack on each other thành 1 dòng 1 item-->
+                                    <!--https://bytewebster.com/frontendprojects/productcardcss--> <!--tải source code của CSS Product Card-->
+                                    
+                                    <!--dùng Flipping card của W3CSS-->
+                                    <div class="flip-card">
+                                        <div class="flip-card-inner"> <!--class="flip-card-inner" là yếu tố quyết định việc quay từ front sang back -->
+                                            <div class="flip-card-front"> 
+                                                <div class="product-card">
+                                                    <!--ghi chú: do Role không có trong Model 's schema nên dù có trong CSDL cũng undefined khi truy cập'-->
+                                                    <!--ghi chú 2: vài nhân viên chưa có Ma_so trong CSDL nên undefined Ma_so-->
+                                                    <div style="text-align:center" class="card-tag"> <%=  nv.Ho_ten  %> <span style="color:orangered"><%= nv.Ma_so  %></span>  <%= nv.Role   %>  </div>
+                                                    <div class="card-header">
+                                                        <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp"
+                                                                  alt="Avatar" class="img-fluid my-5" style="width: 80px;" />
+                                                    </div>
+                
+                                                    <div class="card-body">
+                                                        <h4 class="product-title"> <%= nv.Mail  %> </h4>
+                                                        <p class="product-status"> <%= nv.Don_vi.Chi_nhanh.Ten  %> - <%= nv.Don_vi.Chi_nhanh.Ma_so  %></p>
+                                                        <p class="product-prices"><%= nv.Dia_chi  %></p>	
+                                                    </div>
+                
+                                                    <div class="card-footer">
+                                                        <button class="btn btn-secondary">
+                                                            <i class="fa fa-pencil" aria-hidden="true"></i>
+                                                            <a href="/quanlychinhanh/thongtincovid/nhanvien/<%= nv._id  %>" class="btn">Thông tin Covid</a>
+                                                        </button> <!--POST req để gửi object chứa hidden input là _id của nhân viên, tới trang kế sẽ so trùng lấy tờ khai covid nào có _id này-->
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="flip-card-back">
+                                                <div class="product-card">
+                                                    
+                                                    
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    
+                                </div>
+                            <% } %>
+                        <% }else{  %>
+                            <h1>Xin lỗi, Không có nhân viên nào</h1>
+                        <% } %>
+                    </div>
+                </div>
+
+        </div>
+
+<%- include('../views/layouts/khuc_cuoi.ejs') %>

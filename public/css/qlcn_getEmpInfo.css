@@ -1,0 +1,64 @@
+.product-card{
+	background-color: #fff;
+	border-radius: 1rem;
+	box-shadow: 0 0 15px rgba(0, 0, 0, 0.25);
+
+    /*cover hết content theo chiều dọc*/
+    min-height:100%;
+}
+
+.card-body{
+    text-align:center /*tất cả content trong div card-body sẽ phải canh giữa*/
+}
+
+.card-tag{
+	background-color: rgba(179 , 75 , 248 , 0.3);
+	
+}
+.card-header{
+	
+	text-align: center;
+}
+.card-header img{
+	
+}
+.product-title{
+	
+	color: #353535;
+	
+}
+
+.product-status{
+	color: #808080;
+}
+.product-price{
+	
+	color: #353535;
+	
+}
+.card-footer{
+    /*
+     	display: flex;
+    */
+     	justify-content: space-between;
+    
+
+    /*flex sẽ ức chế text-align center, trong đó text là HTML của button*/
+    text-align: center;
+}
+
+
+.btn-secondary{
+	color: #808080;
+}
+.btn-secondary:hover{
+	background-color: #9B9090;
+	color: white;
+}
+
+
+.card-footer .btn:first-child{
+	
+}
+
+/*set cho max-width 400px thì cho nút Add Cart và Buy xếp chồng nhau (lý do là màn hình 412px Samsung A51 thì đủ hàng ngang*/

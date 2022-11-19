@@ -1,0 +1,280 @@
+
+<%- include('../views/layouts/khuc_dau.ejs') %>
+<%- include('../views/layouts/header.ejs') %>
+    <div class="container">
+        <h1 style="background-color: rgb(222 234 77); color: rgb(255,255,0);" class="index_title">Employee CheckIn CheckOut</h1>
+
+        <!--định dạng CSS thông điệp tương tự view register và login_mobile_w3css-->
+        <% if(message){%> 
+            <div class="directMessage w3-panel w3-pale-green user-message user-message--error">
+                <%= message  %>
+            </div>
+        <%}%>
+
+        <div style="min-height:100%" class="index_main_section">
+          <title><%=  title %></title> 
+
+          <%
+              transferHourToMinutes=function(string){
+                  var c=string.split(':');
+                  return parseInt(c[0])*60+parseInt(c[1]);   //trả về int 
+              }
+          
+              <!--muốn return phải biết cấu trúc là 12:18:47 giờ:phút:giây-->
+              <!--split(nơi_cắt_chuỗi) sẽ destructure một string thành phiên bản array chứa các substrings-->
+          %>
+          
+          <% let updatedAt=new Date(attendance_danh_cho_Notice2.updatedAt)  %>
+          <%  let updatedAt_giophutgiay = updatedAt.getHours()  + ":" + updatedAt.getMinutes() + ":" + updatedAt.getSeconds();   %>
+          <!--chỉ cần updatedAt và createdAt thì mongoose.find( {lấy 2 fields thôi } )-->
+          
+          <% let createdAt=new Date(attendance_danh_cho_Notice2.createdAt)  %>
+          <%  let createdAt_giophutgiay = createdAt.getHours()  + ":" + createdAt.getMinutes() + ":" + createdAt.getSeconds();   %>
+            
+          
+          <section class="blog-banner-area" id="blog">
+              
+                <div class="blog-banner">
+                  <div class="text-center">
+                    
+                    <nav aria-label="breadcrumb" class="banner-breadcrumb">
+                      <ol class="breadcrumb" style="justify-content: center; margin:10%">
+                          <li class="breadcrumb-item main-header__item">
+                             <a class="<%= path === '/staff' ? 'active' : '' %>" href="#">Home</a>
+                          </li>
+          
+                          <!--li class="breadcrumb-item active"-->
+                          <li class="breadcrumb-item main-header__item" aria-current="page">
+                              <a class="<%= path === '/staff/diemdanh' ? 'active' : '' %>" >Diem danh</a>
+                          </li>
+          
+                        
+                          <li class="breadcrumb-item main-header__item" aria-current="page">
+                            <a class="<%= path === '/staff/submitted_and_received_diemdanh' ? 'active' : '' %>">Submit</a>
+                          </li>
+          
+                          <li class="breadcrumb-item main-header__item" aria-current="page">
+                            <a class="<%= path === '/staff/checkout' ? 'active' : '' %>">Check out</a>
+                          </li>
+          
+                          <li class="breadcrumb-item main-header__item" aria-current="page">
+                              <a class="<%= path === '/staff/ketthuclam' ? 'active' : '' %>">Ket thuc lam</a>
+                          </li>
+          
+                          <li class="breadcrumb-item main-header__item" aria-current="page">
+                            <a class="<%= path === '/staff/nghiphep' ? 'active' : '' %>">Nghi phep</a>
+                          </li>
+                      </ol>
+                    </nav>
+                  </div>
+                </div>
+             
+            </section>
+            
+            <div style="margin-left:6vw;margin-right:6vw">
+              
+                  <%    if(Working) {    %>   
+                          <div>
+                            <span>Trạng thái của nhân viên: </span>
+                            <i>Đang làm việc</i> 
+                            <p id="diemdanh">Xác nhận Lưu thông tin <i>Đang làm việc</i>  vào CSDL:</p>
+                            
+                            <form id="DiemDanh" action="/staff/submitted_and_received_diemdanh" method="POST">
+                              <label for="EmpName">Tên nhân viên:</label><br>
+                                  <input id="EmpName" class="form-control" type="text" name="ten" value="<%= ten_nhan_vien  %>" aria-label="readonly input example" readonly>
+          
+                              <label for="EmpWorkplace">Nơi làm việc:</label><br>
+                                  <select name="noilamviec" id="EmpWorkplace" class="form-select" aria-label="Default select example">
+                                    <option value="Cty" selected>Công ty</option>
+                                    <option value="Nha">Nhà</option>
+                                    <option value="KH">Khách hàng</option>
+                                  </select>
+                              <label for="EmpStartTime">Giờ bắt đầu làm việc:</label><br>
+                                  <input id="EmpStartTime" class="form-control" type="text" value="<%= gio_bat_dau_lam_viec  %>" aria-label="readonly input example" readonly><br>
+                              
+                              <input type="submit" class="btn btn-dark" value="Submit">  <!--button với type button không đi được-->
+                            </form>
+                          </div>
+          
+                          <br>
+                          <section>
+                              <h6> (Notice 1:) Kết quả điểm danh trả về từ CSDL : </h6>
+                              <article>
+                                <p>Tên nhân viên: <i><%= attendance_danh_cho_Notice1.name   %></i> </p>
+                                <p>Nơi làm việc: <i><%= attendance_danh_cho_Notice1.work_location   %></i>  </p>
+                                <p>Thời gian (server) bắt đầu: <i><%=   (new Date(attendance_danh_cho_Notice1.createdAt)).toLocaleString()    %> </i> </p>
+                                <p>Date bắt đầu: <i><%=(new Date(attendance_danh_cho_Notice1.createdAt)).toLocaleString().split(',')[0]    %></i></p>
+                                
+                              </article>
+                        
+                              <!--nút post yêu cầu checkout (xác nhận với 2 thuộc tính thêm vô recordedAttendance là checkout và userId cả hai đều required false) cho đơn điểm danh cuối cùng trong nhóm-->
+                              <form method="POST" action="/staff/checkout">
+                                  <input type="submit" class="btn btn-dark" value="Check out">
+                              </form>
+                              
+                              <br>
+                              
+                              <!--https://stackoverflow.com/questions/37475430/get-only-the-last-element-of-array-mongoose-->
+                              <!--nếu checkin và checkoutt trong cùng 1 tiếng thì ko thể áp dụng new Date(attendance.updatedAt).getHours()  - new Date(attendance.createdAt).getHours()   vì kết quả ra 0-->
+                              
+                              <h6>(Notice 2)</h6>
+                              <h6>Giờ checkout</h6>
+                              
+                               <%=     updatedAt_giophutgiay  %>
+                               <%=   transferHourToMinutes(updatedAt_giophutgiay) %>
+                        
+                               <br>
+                        
+                              <h6>Giờ checkin</h6>
+                               
+                               <%=     createdAt_giophutgiay  %>
+                               <%=   transferHourToMinutes(createdAt_giophutgiay) %>
+          
+                              
+                        
+                              <h5>Số giờ (phút) làm của bạn trong phiên này: <i> <%= transferHourToMinutes(updatedAt_giophutgiay)-transferHourToMinutes(createdAt_giophutgiay) %></i> </h5>
+                        
+                          </section>
+                            
+                  <%    } else if(Working == false) { %>  
+                          <div class="rest">
+                              <span>Trạng thái của nhân viên: </span>
+                              <i>Không (hoặc Đã Ngưng) làm việc </i>
+                              
+                              <!-- cho section cùng nhận class="rest" để float right-->
+                              <section>
+                                <% let ngay_hom_nay;  %>  <!-- nếu để phía sau switch-case thì báo lỗi: Cannot access 'ngay_hom_nay' before initialization-->
+                                <%
+                                  switch (new Date().getDay()) { <!--thứ tự thường thấy là 0-1-2-... -6 tương ứng Sun-sat -->
+                                    case 0:
+                                    ngay_hom_nay = "Sunday";
+                                      break;
+                                    case 1:
+                                    ngay_hom_nay = "Monday";
+                                      break;
+                                    case 2:
+                                      ngay_hom_nay = "Tuesday";
+                                      break;
+                                    case 3:
+                                    ngay_hom_nay = "Wednesday";
+                                      break;
+                                    case 4:
+                                    ngay_hom_nay = "Thursday";
+                                      break;
+                                    case 5:
+                                    ngay_hom_nay = "Friday";
+                                      break;
+                                    case 6:
+                                    ngay_hom_nay = "Saturday";
+                                  }
+                                  %>
+          
+                                
+                                <p>Sẽ được ghi nhận vào CSDL trong phạm vi ngày:  <%= ngay_hom_nay %></p>
+                                   <!--https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_getday-->
+                                   <!--từ đó switch case 0 tới 6 tương ứng T2 tới CN sẽ ra ngày hiện tại để lưu CSDL-->
+                                  <% 
+                                      const d = new Date();
+                                      let day = d.getDay() 
+                                  %>
+                                  <!--thay vì trong html viết script xử lý ở trình duyệt thì cũng logic đó mà xử lý ở ejs template-->
+                                  <!--<%= day  %>-->
+                                  <!--https://www.w3schools.com/js/js_switch.asp-->
+                                <p>Danh sách các phiên (bắt đầu - kết thúc - nơi làm việc) trong ngày  <%= ngay_hom_nay %></p>
+                                    <!--https://www.geeksforgeeks.org/mongodb-db-collection-find-method/-->
+                                    <!--https://www.tutorialspoint.com/mongodb-query-select-and-display-only-a-specific-field-from-the-document-->
+                                    <!--https://www.mongodb.com/docs/manual/reference/method/cursor.toArray/-->
+                                    
+                                    <!--https://www.geeksforgeeks.org/mongoose-find-function/-->
+                                    <!--cần 1 mảng do staffController gửi tới đây để hiển thị thông tin-->
+                                    <!--/https://stackoverflow.com/questions/70809817/how-to-handle-passed-ejs-variable-as-a-string-->
+                                     <i><%=  mang_cac_doi_tuong_3_thuoc_tinh.length  %></i> đối tượng ghi nhận ngày <i><%= Chuoi_ngay_de_tinh_gio_lam  %></i>
+                                     <br>
+                                     <%= mang_cac_doi_tuong_3_thuoc_tinh %>
+                                     
+                                    <!--https://stackoverflow.com/questions/16325817/in-mongoose-how-to-filter-an-array-of-objects-->
+                                    <!--https://stackoverflow.com/questions/33627238/mongoose-find-with-multiple-conditions-->
+                                    <!-- nhưng trong ejs template chỉ dùng javascript vanilla, không dùng được hàm find của mongoose-->
+                                    <br><br>
+                                    <p>Mảng  các attendances đã lọc luôn diễn ra ngày <i><%= Chuoi_ngay_de_tinh_gio_lam  %></i> </p>
+                                    <%= mang_cac_doi_tuong_co_Chuoi_ngay_de_tinh_gio_lam=  mang_cac_doi_tuong_3_thuoc_tinh.filter(e=>Chuoi_ngay_de_tinh_gio_lam === new Date(e.createdAt).toLocaleString().split(',')[0] ) %>
+                                    có <i><%= mang_cac_doi_tuong_co_Chuoi_ngay_de_tinh_gio_lam.length  %></i> đối tượng
+                                <br><br>
+                                <p>Số phút đã làm trong phiên điểm danh gần nhất: <i> <%= transferHourToMinutes(updatedAt_giophutgiay)-transferHourToMinutes(createdAt_giophutgiay) %></i> </p>
+                                <!--thực hiện hàm transferHourToMinutes(string) cần attendance_danh_cho_Notice2 do đó phải render 'staff/index' với thông tin của attendance_danh_cho_Notice2 vào path '/staff/ketthuclam' , nếu không thì báo lỗi attendance_danh_cho_Notice2 is not defined-->
+                                <p>Số phút đã làm trong từng phiên điểm danh trong ngày <i><%= ngay_hom_nay %>  <%= Chuoi_ngay_de_tinh_gio_lam  %></i>  :</p>
+                                <!--https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map-->
+                                <!--https://stackoverflow.com/questions/13260487/does-ejs-handle-array-mapcallback-->
+                                <!--https://stackoverflow.com/questions/44218936/typeerror-string-split-is-not-a-function-->
+          
+                                <%=  mang_cac_doi_tuong_co_Chuoi_ngay_de_tinh_gio_lam %>
+                                <%=  Array.isArray(mang_cac_doi_tuong_co_Chuoi_ngay_de_tinh_gio_lam) %> <!--true-->
+          
+                                <br>
+          
+                                <!--transferHourToMinutes-->
+                                <% 
+                                   //sắp theo cấp độ cao xuống thấp
+                                    var mang_doi_tuong_da_lam_trong_ngay = []; 
+          
+                                    var mang_doi_tuong_in_out=[];
+          
+                                    <!--thực hiện-->
+                                    mang_cac_doi_tuong_co_Chuoi_ngay_de_tinh_gio_lam.forEach(function(e){
+                                        var doi_tuong_inMinutes_outMinutes={
+                                            //do doi_tuong_inMinutes_outMinutes đã var rồi thì thoi_diem_vao,thoi_diem_ra không cần var hay let (nếu có sẽ báo lỗi)
+                                            thoi_diem_vao:0,
+                                            thoi_diem_ra:0
+                                        }
+                                        var c= new Date(e.createdAt)
+                                        var u= new Date(e.updatedAt)
+              
+                                        doi_tuong_inMinutes_outMinutes.thoi_diem_ra=transferHourToMinutes(u.getHours()  + ":" + u.getMinutes() + ":" + u.getSeconds());
+                                        doi_tuong_inMinutes_outMinutes.thoi_diem_vao=transferHourToMinutes(c.getHours()  + ":" + c.getMinutes() + ":" + c.getSeconds());
+                                                
+                                        mang_doi_tuong_in_out.push(doi_tuong_inMinutes_outMinutes);
+          
+                                    }) 
+          
+                                    let Tong_thoi_gian_lam_viec_theo_phut = 0;
+                                    mang_doi_tuong_in_out.forEach(in_out_object => {
+                                      Tong_thoi_gian_lam_viec_theo_phut += (in_out_object.thoi_diem_ra - in_out_object.thoi_diem_vao) ;
+                                    })
+                                %>
+          
+                                
+          
+                                <%= JSON.stringify(mang_doi_tuong_in_out) %>
+                                <%= mang_doi_tuong_in_out.length %>
+                                <br> 
+                                <!--chú ý: nếu % và = tách nhau 1 white space sẽ báo lỗi token -->
+                                <i>Trong ngày <%= Chuoi_ngay_de_tinh_gio_lam %>, Tổng thời gian làm theo phút là: </i><%= Tong_thoi_gian_lam_viec_theo_phut %> 
+          
+                              
+          
+                              </section>
+                          </div>
+          
+                          
+                            
+                  <%    }  %>
+            </div>
+        </div>
+    </div>
+
+    <%- include('../views/layouts/khuc_cuoi.ejs') %>
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+

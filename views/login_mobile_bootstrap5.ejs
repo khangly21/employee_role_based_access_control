@@ -1,0 +1,65 @@
+<%- include('../views/layouts/khuc_dau.ejs') %>
+<%- include('../views/layouts/header.ejs') %>
+
+<!--trang này sẽ nhận biến nào đó do controller truyền tới để xử lý KHÔNG hiển thị nút Login trên thanh dieu_huong-->
+<!--chú ý bài giảng Maximillian không dùng Bootstrap nên ông ta không nên dùng class="form-control" dễ lẫn lộn, vì của Bootstrap có thể mobile first-->
+
+<div class="container">
+    <h1 style="text-align:center;color:rgb(87,210,24)">LOGIN FORM</h1>
+    <% if (errorMessage) { %>
+        <div class="directMessage w3-panel w3-pale-green user-message user-message--error"><%= errorMessage %></div>
+    <% } %>
+
+    <%  if(!isLoggedIn){  %>
+            <form action="/admin/login" method="POST" novalidate>
+                <!--note: các thành phần của form sẽ dùng Bootstrap CSS-->
+                <!--input,textarea  👉 class="form-control" -->
+                <!--label 👉 class="form-label"-->
+                <!--button 👉 class="btn btn-primary mb-3"-->
+                <!--box 👉 class="mb-3"-->
+                <!--Bootstrap spacing 👉 https://getbootstrap.com/docs/4.0/utilities/spacing/-->
+                <!--form 👉 https://getbootstrap.com/docs/5.0/forms/layout/-->
+                <!--màu chữ 👉 W3CSS framework w3-text-green w3-text-blue-->
+                    <div>
+                        <label class="form-label w3-text-green" for="username">Email/Username</label>
+                        <input class="form-control w3-text-blue" type="text" name="username" value="lyvietkhang" id="username" />
+                        <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+                    </div>
+                  
+                    <br>
+                    <div> <!--chỗ này thường class col nếu form có class row-->
+                        <label class="form-label w3-text-green" for="password">Password</label>
+                        <input class="form-control w3-text-blue" type="password" name="password" value="ADMIN_123456" id="password" />
+                    </div>
+                  
+                    <!--cô Hạnh thường dùng button tag với class="btn btn-success"-->
+                    <!--cho inline css background-color:rgb(87,210,24) thì nó chiếm ưu thế hơn màu lục của class="btn btn-success" mà không cần !important-->
+                    <button style="margin: 1rem ; background-color:rgb(87,210,24) " type="submit" class="btn btn-success">Login</button>
+                    
+            
+            </form>
+    
+            <div>
+                <% if(role) {  %>
+                    <p id="if_you_have_registered_yet">
+                        <!--href luôn dùng absolute path gắn trực tiếp vào computer address-->
+                        <!-- Don't have an account? <span> <a href=`/${role}/register`>👉 Register </a></span> -->
+                        <!-- Don't have an account? <span> <a href=`/${<%=role%>}/register`>👉 Register </a></span> -->
+            
+                        <!--🔑Solution? https://stackoverflow.com/questions/63042961/ejs-with-template-literals-in-form-->
+                        <!--phải có " " phối hợp ' ' và EJS tag-->
+            
+                        <!--<a href= "<%= `/${role}` %>/register" >-->
+                        Don't have an account? <span> <a href= "<%= `/${role}` %>/register" >👉 Register </a></span>
+                    </p>
+                <% }  %>
+            </div>
+
+    <%  }else{  %>
+        <p>Bạn đã đăng nhập</p>     
+    <% } %>
+    
+    <br/>
+</div>
+
+<%- include('../views/layouts/khuc_cuoi.ejs') %>

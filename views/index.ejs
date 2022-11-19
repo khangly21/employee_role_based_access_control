@@ -1,0 +1,49 @@
+<%- include('../views/layouts/khuc_dau.ejs') %>
+<%- include('../views/layouts/header.ejs') %> <!-- nếu có lỗi Invalid regular expression: missing / ngay tại http://localhost:3002/ là biết controller đã gửi thiếu gì đó cho view index-->
+        
+
+        <div class="container">
+            <h1 class="index_title w3-orange" style="font-family: Amita;">Role Based Access Control</h1>
+
+            <!--định dạng CSS thông điệp tương tự view register và login_mobile_w3css-->
+            <% if(message){%> 
+                <div class="directMessage w3-panel w3-pale-green user-message user-message--error">
+                        <%= message  %>
+                </div>
+            <%}%>
+            <div class="index_main_section">
+                <ol class="index_main-info">
+                    <li><b>Express JS </b></li>
+                    <li><b>EJS</b> templating engine</li>
+                    <li>
+                      <b>Styling — </b>custom CSS (you can use any like Bootstrap, Bulma,
+                      Tailwind, etc...)
+                    </li>
+                    <li><b> PassportJS </b>local authentication(email, password)</li>
+                    <li><b>Roles</b> (admin, moderator, client)</li>
+                    <li><b>Authorization</b> (admin, moderator and user routes)</li>
+                    <li><b>Mongoose</b> (ORM for MongoDB)</li>
+                    <li>How to use <b>express sessions</b></li>
+                    <li>
+                      Using sessions to <b>persist login </b> after server reboot (using Mongo
+                      Store)
+                    </li>
+                    <li><b>Redirect</b> to same page after login.</li>
+                    <li><b>Validating</b> user input server side</li>
+                    <li><b>Flash messages</b></li>
+                    <li>Handling <b>HTTP error</b> (ex: 404, etc)</li>
+                    <li>Somethings are always extra 😊</li>
+                </ol>
+            </div>
+        </div>
+
+        <!--https://www.freecodecamp.org/news/html-button-onclick-javascript-click-event-tutorial/-->
+        <!--https://stackoverflow.com/questions/3268012/javascript-fire-function-on-click-->
+        <!--https://stackoverflow.com/questions/67066485/how-to-import-and-export-function-in-express-js-with-es-->
+        <!--vd https://youtu.be/rvp94BWcEl0   to require 'easyinvoice' package-->
+      
+
+    </main>
+    
+<%- include('../views/HTML/contact_us.ejs')  %>
+<%- include('../views/layouts/khuc_cuoi.ejs') %>

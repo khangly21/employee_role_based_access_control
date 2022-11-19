@@ -1,0 +1,7 @@
+<!--màu colletion bằng number thì máy xử lý nhanh hơn-->
+<!--https://bc.game/login/regist-->
+<!--rgb(87,210,24)-->   <!--xanh lục-->
+<!--rgb(87,210,24)-->   <!--xanh lục đen-->
+<!--rgb(241,53,5)-->    <!--đỏ cam-->
+
+rgb(255,240,199)  --> vàng nhạt cryptowin.io

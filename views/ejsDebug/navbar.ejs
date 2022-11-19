@@ -1,0 +1,64 @@
+<!--Bootstrap 5-->
+
+<nav class="navbar navbar-light bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">
+          <img src="http://purepng.com/public/uploads/large/purepng.com-donald-duck-happydonald-duckdonaldduckcartooncharacter1934walt-disneywhite-duck-17015285464592qqyb.png" alt="" width="30" height="24" class="d-inline-block align-text-top">
+          RETI
+        </a>
+    </div>
+</nav>
+
+<nav class="navbar navbar-inverse">
+    <div class="container-fluid">
+
+        <div class="navbar-header">
+          <a class="navbar-brand" href="#">P.E.T</a>
+        </div>
+
+        <ul class="nav navbar-nav">
+            <li class="active"><a href="/">Home</a></li>
+            <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown" >Role Filter<span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                    <!--các href đều absilute paths vào localhost:3002-->
+                    <!-- <li><a href="/">Visitor</a></li> -->
+                    <li><a href="/admin/login?">Admin</a></li>
+                    <li><a href="/nhanvien/login?">Employee</a></li>
+                    <li><a href="/quanlychinhanh/login?">Branch manager</a></li>
+                </ul>
+            </li>
+            <% if (role === 'admin') { %>
+                <li><a href="#">Manage Users</a></li>
+            <% } %>
+    
+            <% if (role === 'nhanvien') { %>
+                <li><a href="#">Personal Profile</a></li>
+                <li><a href="#">Statistics</a></li>  
+            <% } %>
+    
+            <% if (role === 'quanlychinhanh' || role === 'nhanvien') { %>
+                <li><a href="#">Employee Covid19 </a></li>
+                <li><a href="#">Attendance</a></li>
+            <% } %>
+      
+        </ul>
+
+        <!--role='visitor' không tham gia-->
+      <% if(role === 'admin' || role === 'nhanvien' || role === 'quanlychinhanh') { %>
+            <ul class="nav navbar-nav navbar-right">
+                <% if(!pageRegister){  %>
+                    <li><a href="<%=`/${role}`%>/register"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
+                <% }  %>
+                <!-- 😎 <%=`/${role}`%>/register-->
+                <!-- 💌 GHI CHÚ cái sai (VD thiếu dấu = hay / bên ngoài ` `) thì EJS sẽ đọc được và báo lỗi-->
+      
+                <% if(!pageLogin) {   %>
+                    <li><a href="<%=`/${role}`%>/login"><span class="glyphicon glyphicon-log-in"></span> Log In</a></li>
+                <%  }  %>
+                <!-- 😎 <%=`/${role}`%>/login-->
+            </ul>
+    <% } %>
+
+
+    </div>
+</nav>

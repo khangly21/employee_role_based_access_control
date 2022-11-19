@@ -1,0 +1,88 @@
+<%- include('../views/layouts/khuc_dau.ejs') %>
+<%- include('../views/layouts/header.ejs') %> <!-- nếu có lỗi Invalid regular expression: missing / ngay tại http://localhost:3002/ là biết controller đã gửi thiếu gì đó cho view index-->
+        <div class="container">
+            <h1 style="background-color: rgb(222 234 77); color: rgb(255,255,0);" class="index_title">Employee Personal Covid19  information</h1>
+
+            <!--định dạng CSS thông điệp tương tự view register và login_mobile_w3css-->
+            <% if(message){%> 
+                <div class="directMessage w3-panel w3-pale-green user-message user-message--error">
+                        <%= message  %>
+                </div>
+            <%}%>
+
+            
+
+            <div style="min-height:100%" class="index_main_section">
+                Nhân viên:<h4 style="color:#F2560A"> <%= user.Ho_ten  %> </h4>
+                            <form method="POST" action="/nhanvien/manHinhNhapCovidNhanvien">
+                                <div>
+                                    <label for="tempBody">Thông tin thân nhiệt</label>
+                                    <!-- Kèm thông tin thân nhiệt: https://stackoverflow.com/questions/68589926/adding-date-and-time-to-hidden-input-value-->
+                                    <input id="hiddenDateTime" name="hiddenDateTime" value="<%= datetimeNow %>" type="hidden" />
+                                    <input id="tempBody" type="number" step="0.01" name="thannhiet" value="">  <!--VD 37.50-->
+                                </div>
+                        
+                                <!--https://www.javascripttutorial.net/javascript-dom/javascript-checkbox/-->
+                                <div>    
+                                    <input type="checkbox" id="vaccine1" name="vaccine1" value="injection1">
+                                    <label for="vaccine1"> Vaccine mũi 1</label><br>
+                        
+                                    <input type="checkbox" id="vaccine2" name="vaccine2" value="injection2">
+                                    <label for="vaccine2"> Vaccine mũi 2</label><br>
+                        
+                                    <input type="checkbox" id="vaccine3" name="vaccine3" value="injection3">
+                                    <label for="vaccine3"> Vaccine mũi 3</label><br>
+                        
+                                    <input type="checkbox" id="vaccine4" name="vaccine4" value="injection4">
+                                    <label for="vaccine4"> Vaccine mũi 4</label><br>
+                                </div>
+                        
+                                <div>
+                                    <label for="vac01_origin">Hãng sản xuất mũi 1</label>
+                                    <input id="vac01_origin" name="NhaSXvac1" value=""   />
+                                    <label for="vac01_date">Ngày tiêm mũi 1</label>
+                                    <input type="Date" id="vac01_date" name="vac01_date" value=""/>
+                                    <br>
+                        
+                                    <label for="vac02_origin">Hãng sản xuất mũi 2</label> 
+                                    <input id="vac02_origin" name="NhaSXvac2" value=""   /> 
+                                    <label for="vac02_date">Ngày tiêm mũi 2</label>
+                                    <input type="Date" id="vac02_date" name="vac02_date" value=""/>
+                                    
+                                    <br>
+                        
+                                    <label for="vac03_origin">Hãng sản xuất mũi 3</label>
+                                    <input id="vac03_origin" name="NhaSXvac3" value=""   /> 
+                                    <label for="vac03_date">Ngày tiêm mũi 3</label>
+                                    <input type="Date" id="vac03_date" name="vac03_date" value=""/>
+                                    
+                                    
+                                    <br>
+                        
+                                    <label for="vac04_origin">Hãng sản xuất mũi 4</label>
+                                    <input id="vac04_origin" name="NhaSXvac4" value=""   /> 
+                                    <label for="vac04_date">Ngày tiêm mũi 4</label>
+                                    <input type="Date" id="vac04_date" name="vac04_date" value=""/>
+                                    <br>
+                                </div>
+                                
+                                
+                                <div>
+                                        <p>Phản ứng với Covid-19:</p>
+                                        <input type="radio" id="pos" name="result" value="Dương tính">
+                                        <label for="pos">Dương tính</label><br>
+                                        <input type="radio" id="neg" name="result" value="Âm tính">
+                                        <label for="neg">Âm tính</label>
+                                </div>
+                                
+                        
+                                <div style="background-color: aquamarine;">
+                                    <label for="submitButton">Đồng ý gửi</label>
+                                    <input id="submitButton" type="submit" class="btn btn-success"/> 
+                                </div>
+                            </form>
+                    
+            </div>
+            <%- ContactUs %>
+        </div>
+<%- include('../views/layouts/khuc_cuoi.ejs') %>

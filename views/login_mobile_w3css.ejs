@@ -1,0 +1,39 @@
+<%- include('../views/layouts/khuc_dau.ejs') %>
+<%- include('../views/layouts/header.ejs') %>
+
+<% if (errorMessage) { %>
+    <!--không cần color, đã có trong NV chính-->
+    <div class="directMessage w3-panel w3-pale-green user-message user-message--error"><%= errorMessage %></div>
+<% } %>
+
+<!--Fatal error: có tồn tại route POST cho "/nhanvien/login" hay không-->
+<form method='POST' action="/nhanvien/login" style="text-align:center" class="w3-container w3-card-4"  novalidate>
+    <h2 class="w3-text-blue">Login Form</h2>
+    <p>      
+    <label class="w3-text-blue"><b>Username</b></label>
+    <!--muốn background của ô input có màu xanh lá thì w3-green-->
+    <input  class="w3-input w3-border w3-text-pink" name="username" type="text" value="NV_1"></p
+    <p>      
+    <label class="w3-text-blue"><b>Password</b></label>
+    <input class="w3-input w3-border w3-text-pink" name="password" type="password" value="NV_1">
+    </p>
+    <p>
+        <div class="form-check mb-3">
+            <label class="form-check-label">
+                <input class="form-check-input" type="checkbox" name="remember"> <span class="w3-text-blue">Remember me</span>
+            </label>
+        </div>
+    </p>
+    <p>      
+    <button type="submit" class="w3-btn w3-blue">Login</button></p>
+</form>
+<br/>
+<div style="text-align:center">
+    <% if(role) {  %>
+        <p>
+            Don't have an account? <span> <a href= "<%= `/${role}` %>/register" >👉 Register </a></span>
+        </p>
+    <% }  %>
+</div>
+
+<%- include('../views/layouts/khuc_cuoi.ejs') %>

@@ -1,0 +1,131 @@
+<%- include('../views/layouts/khuc_dau.ejs') %>
+<%- include('../views/layouts/header.ejs') %> <!-- nếu có lỗi Invalid regular expression: missing / ngay tại http://localhost:3002/ là biết controller đã gửi thiếu gì đó cho view index-->
+
+<!--Fetching vulnerabilities -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
+        <div class="container">
+            <h1 style="background-color: rgb(222 234 77); color: rgb(255,255,0);" class="index_title">Đơn xin nghỉ phép</h1>
+
+            <!--định dạng CSS thông điệp tương tự view register và login_mobile_w3css-->
+            <% if(message){%> 
+                <div class="directMessage w3-panel w3-pale-green user-message user-message--error">
+                        <%= message  %>
+                </div>
+            <%}%>
+
+            
+
+            <div style="min-height:100%" class="index_main_section">
+                <!--form action="/nhanvien/dangkynghiphep" sau đó res.redirect('/')-->
+                <form class="onLeave-form" action="/nhanvien/dangkynghiphep" method="POST">
+                    <div class="">
+                        <label for="title">Title</label>
+                        <input class="w3-text-blue" type="text" name="title" id="title" value="nghỉ lễ/việc cá nhân">
+                    </div>
+                    <div class="">
+                        <label for="annualLeave">Số ngày phép năm (max: 12 ngày per year)</label>
+                        
+                        <input step="0.01" id="annualLeave" class="w3-text-blue"  type="number" name="annualLeave" id="annualLeave" value="<%= nhanvien.annualLeave%>" readonly>
+                    </div>
+                  
+                        <div class="">
+                            <!--Nếu số ngày annualLeave còn lại là 0 thì thông báo và không cho phép đăng ký.-->
+                            <label for="annualLeaveHours">Số ngày phép năm còn lại quy đổi ra giờ </label>
+                            <!--ký tự ejs thiếu = là không hiển thị số 15-->
+                            <!-- ejs không lồng ejs mà viết nối tiếp nhau-->
+                                <input id="annualLeaveHours" class="w3-text-blue"  type="number" name="annualLeave" id="annualLeave" value="<%= so_h_annualLeave%>" readonly>
+                        </div>
+            
+                        <div class="">
+                           
+                            <label for="date_to_off">Chọn ngày và số giờ tương ứng để nghỉ phép (có thể nhiều ngày)</label>
+                           
+                            <div id="fields_unremovable" class="date_fields">
+                                <article class="section_removable">
+                                    <!--vì sao row col không có tác dụng??-->
+
+                                    <div class="container">
+                                        <div class="row">
+                                            <div class="col-sm-3">
+                                                <div>Date :</div>
+                                                <!--💊note: trong name có [] thì trong trường hợp sau: https://stackoverflow.com/questions/42610022/receive-form-data-in-an-array-in-node-js-using-express-->
+                                                <!--💊note: trong value có [] thì xem appLTV của môn NMCNPM-->
+                                                <input class="w3-text-orange" type="date" name="date_to_off"   value="" > <!--Note, có thể dùng type text như https://adnan-tech.com/calculate-difference-between-2-dates-jquery/-->
+                                            </div>
+                
+                                            <div class="col-sm-3">
+                                                
+                                                <div>Hours :</div>
+                                                
+                                                <input step="0.01" class="w3-text-blue hours" name="hour_to_off" type="number" min="0" max="8"  value="" > <span style="color:greenyellow">(max:8h)</span> <!--lấy giá trị người dùng nhập bằng DOM this.value-->
+                                                <!--min max ở đây nếu bị vượt qua thì sẽ bị browser báo lỗi-->
+                                            </div>
+
+                                            
+                                            <div class="col-sm-3">
+                                                <div>Sum of hours :</div>
+                                                <!-- <span id="sum" style="font-weight: bold;background-color:yellow">0</span> thì $("#sum").html(sum.toFixed(2));-->
+                                                <input type="number" step="0.01" id="sum" style="font-weight: bold;background-color:yellow" min="0" max="<%= so_h_annualLeave  %>" value="0"/>
+                                            </div>
+
+                                            <div class="col-sm-3">
+                                                <input class="btn btn-primary" type="button" id="more_fields" onclick="add_fields();" value="Add More" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                </article>
+                            </div>
+            
+                            <br>
+
+                            <div>
+                                <!--https://stackoverflow.com/questions/22434586/how-to-input-float-numbers-in-html-form-->
+                                <!--https://www.w3docs.com/snippets/javascript/how-to-get-the-value-of-text-input-field-using-javascript.html-->
+                                    <label for="offdays">Sum of days based on Sum of hours (bé hơn Số ngày phép năm còn lại)</label>
+                                    <input class="w3-text-grey" type="number" step="0.01" id="registered_offdays" name="offdays" value="" /> <!--do có thể nhập số thực 1.5 nên không có nút chọn số nguyên?-->
+                                <!--0.01 chỉ lấy 2 chữ nearest sau thập phân,nếu nhập sai là ô input sẽ báo lỗi-->
+                                <!--không có step 0.01 là phải viết integer -->
+                            </div>
+            
+                      
+                        </div>
+                
+                        <div class="">
+                            <label for="reason">Lý do</label>
+                            <textarea  class="w3-text-pink" name="reason" id="reason" rows="5" value="giải quyết phép năm">giải quyết phép năm </textarea> <!--nếu value="giải quyết phép năm" là không có hiện gì hết-->
+                             <!--nếu có html tag hay comment phía sau thì sẽ không được dịch mà hiện rõ h6,h4...-->
+                        </div>
+                        
+                        <input type="hidden" name="id_nhanvien" value="<%= nhanvien._id  %>"/>
+                       
+                        <!--expression in EJS-->
+                        <!--thay vì bao ngoài HTML tag, còn có thể đứng bên trong-->
+
+                        <!--https://stackoverflow.com/questions/40207912/how-to-use-jquery-with-my-node-js-ejs-template-->
+                            <input <%if(nhanvien.annualLeave===0 ){ %> disabled <%  }  %> type="submit" class="btn btn-primary" value="Nộp đơn nghỉ phép">
+                        
+                </form>
+    
+                <!--form-->
+            
+            </div>
+        </div>
+
+        <!--sau khi có $ thì dùng trong đây được không? <input <%if(nhanvien.annualLeave===0 ){ %> disabled <%  }  %>-->
+<script>
+    /*không dùng được EJS tag trong script như $("#songaynghidangky").val() >  ejs tag's nhanvien.annualLeave */
+    $('#registered_offdays').on('change', function () {  //cách 2 là dùng min max trực tiếp
+        if($(this).val() - $("#annualLeave").val() > 0){
+           window.alert("ngay nghỉ phải nhỏ hơn hay bằng annualLeave!"); //test bằng cách gõ trực tiếp vào ô 
+           $(this).val("0");
+        }else{
+            // window.alert($(this).val()) //ok
+            // window.alert($("#annualLeave").val()) //undefined
+            // window.alert("khong co gi") //thông báo này có khi 16 > undefined thì trả về false
+        }
+    })
+    
+</script>
+<%- include('../views/layouts/khuc_cuoi.ejs') %>

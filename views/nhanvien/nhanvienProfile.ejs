@@ -1,0 +1,123 @@
+<%- include('../../views/layouts/khuc_dau.ejs') %>
+<%- include('../../views/layouts/header.ejs') %> <!-- nếu có lỗi Invalid regular expression: missing / ngay tại http://localhost:3002/ là biết controller đã gửi thiếu gì đó cho view index-->
+        <div class="container">
+            <h1 class="index_title">Employee Personal Profile</h1>
+
+            <!--định dạng CSS thông điệp tương tự view register và login_mobile_w3css-->
+            <% if(message){%> 
+                <div class="directMessage w3-panel w3-pale-green user-message user-message--error">
+                        <%= message  %>
+                </div>
+            <%}%>
+            <div class="index_main_section">
+                <ol class="index_main-info">
+                    <!-- xử lý hiển thị nhanvien profile với biến nhanvien truyền tới view này -->
+                    <!--https://mdbootstrap.com/docs/standard/extended/profiles/#section-3-->
+                    <section class="vh-100" style="background-color: #f4f5f7; min-height: 100%;"> <!--với min-height 100% thì container phải cover hết nội dung, ví dụ font-size chữ tăng lên thì container tự dãn ra thêm-->
+                        <div class="container py-5 h-100">
+
+                                    <div class="card mb-3" style="border-radius: .5rem;">
+
+                                        <!--LAYOUT CHÍNH: bootstrap 4 grid layout với row và col 👉 https://www.w3schools.in/bootstrap4/grid/-->
+                                        <!--Lựa chọn khác là ghi từng cột có col-sm-2 col-md-2 col-lg-2 , col-sm-5 col-md-5 col-lg-5 , col-sm-5 col-md-5 col-lg-5-->
+                                        <!--dòng-->
+                                        <div class="row g-0" style="min-height: 100%;">
+                                            <!--cột 1-->
+                                            <div class="col-sm-4 col-md-4 col-lg-4 gradient-custom text-center text-white" style="border-top-left-radius: .5rem; border-bottom-left-radius: .5rem;">
+                                                
+                                                <!--✅ perfect, nhưng path của multer có public đứng trước. Do đó giải pháp là ❤️ cho nhanvienProfile.ejs này vào 1 thư mục cấp dưới 1 bậc của view, lúc đó có thể paste multer's path vào src-->
+                                                
+                                                <img style="width:28rem;padding-top:2rem" src="/userUploadAvatar/<%=employee.imageMulterPath%>" alt="r absolute/relative path" > <!--anh này chứng minh trong index.js không cần app.use('/public',express.static(path.join(__dirname, 'public'))) ??? 👉 sai, phải có, nếu không sẽ không ra hình-->
+                                                <!--✅ src="\..\..\public\userUploadAvatar\r.png"-->
+                                                <!--VD trên MongoDB có imageMulterPath:"public\userUploadAvatar\empAvatar-12-9-2022-444614966-NV_2.png"-->
+                                                <!--thì chỉ cần src="\..\..\<%=employee.imageMulterPath%>"-->
+                                                <!--trong Lab10.18 thì đó là   product.imageUrl -->
+                                                
+                                                <!--https://stackoverflow.com/questions/31397137/img-tag-not-working-with-relative-path-in-src-->
+
+                                                <h5 style="font-family: Calistoga; color:orangered"><%= employee.Ho_ten %></h5>
+                                                <h5 style="font-family: Calistoga; color:orangered"></h5>
+                                                <p style="font-family: Calistoga; color:darkorange">Web Designer</p>  <!--tìm đơn vị trong bảng congties-->
+                                                <i class="fa fa-edit mb-5">Thay đổi hình ảnh : </i>
+
+                                                <!--enctype='multipart/form–data' is an encoding type that allows files to be sent through a POST. Quite simply, without this encoding, the files cannot be sent through POST. If you want to allow a user to upload a file via a form, you must use this enctype.-->
+                                              
+                                                <form enctype="multipart/form-data" method="POST" action="/nhanvien/view_personal_profile">
+                                                    <input id="empAvatar" type="file" class="form-control" name="empAvatar"/>
+                                                    <input type="hidden" name="ID_of_logged_in_employee" value="<%= employee._id %>"/> <!--hidden input sẽ không xác định chính xác type gì-->
+                                                    <input style="margin:2rem auto" type="submit" class="btn btn-success" value="Upload Avartar">
+                                                </form>
+                                            </div>
+                                            <!--kết thúc cột 1-->
+
+                                            <!--cột 2-->
+                                            <div class="col-sm-8 col-md-8 col-lg-8" style="padding-left:0rem;width:80%">
+
+                                                <div style="padding-left:0rem" class="card-body p-4"> <!--padding-left phải là 0rem phù hợp với mobile-->
+                                                    <h3>Information</h3>
+                                                    
+                                                    <div class="row pt-1">
+                                                        <div class="col-6 mb-3 personalInfo">
+                                                          <h6>Mã nhân viên</h6>
+                                                          <p class="details text-muted"><%= employee.Ma_so  %></p>
+                                                        </div>
+                                                        <div class="col-6 mb-3 personalInfo">
+                                                          <h6>Số điện thoại</h6>
+                                                          <p class="details text-muted"><%= employee.Dien_thoai  %></p>
+                                                        </div>
+                                                        <div class="col-6 mb-3 personalInfo">
+                                                            <h6>Giới tính</h6>
+                                                            <p class="details text-muted"><%= employee.Gioi_tinh  %></p>
+                                                        </div>
+                                                        <div class="col-6 mb-3 personalInfo">
+                                                            <h6>Chứng minh nhân dân</h6>
+                                                            <p class="details text-muted"><%= employee.CMND  %></p>
+                                                        </div>
+                                                        <div class="col-6 mb-3 personalInfo">
+                                                            <h6>Đơn vị</h6>
+                                                            <p class="details text-muted"><%= employee.Don_vi.Ten  %></p>
+                                                        </div>
+                                                        <div class="col-6 mb-3 personalInfo">
+                                                            <h6>Chi nhánh</h6>
+                                                            <p class="details text-muted"><%= employee.Don_vi.Chi_nhanh.Ten  %></p>
+                                                        </div>
+                                                        <div class="col-6 mb-3 personalInfo">
+                                                            <h6>Hệ số lương</h6>
+                                                            <p class="details text-muted"><%= employee.salaryScale  %></p>
+                                                        </div>
+                                                    </div>
+
+                                                    <h3>Projects</h3>
+                                                    
+                                                    <div class="row pt-1">
+                                                        <div class="col-6 mb-3 personalInfo">
+                                                          <h6>Recent</h6>
+                                                          <p class="text-muted">Lorem ipsum</p>
+                                                        </div>
+                                                        <div class="col-6 mb-3 personalInfo">
+                                                          <h6>Most Viewed</h6>
+                                                          <p class="text-muted">Dolor sit amet</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="d-flex justify-content-start">
+                                                      <a href="#!"><i class="fa fa-facebook-f fa-lg me-3"></i></a>
+                                                      <a href="#!"><i class="fa fa-twitter fa-lg me-3"></i></a>
+                                                      <a href="#!"><i class="fa fa-instagram fa-lg"></i></a>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!--kết thúc cột 2-->
+
+                                            
+                                        </div>
+                                    </div>
+
+                        </div>
+                </ol>
+            </div>
+        </div>
+    </main>
+
+    <%- Chuoi_HTML_contact_us  %>
+<%- include('../../views/layouts/khuc_cuoi.ejs') %>

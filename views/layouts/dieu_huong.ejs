@@ -1,0 +1,117 @@
+<!--Bootstrap 5-->
+
+<nav style="min-height:20%" class="navbar navbar-light bg-light">
+    <div class="container-fluid">
+        <a style="text-align: center; margin-left:7rem" class="navbar-brand" href="#">
+          <img src="http://purepng.com/public/uploads/large/purepng.com-donald-duck-happydonald-duckdonaldduckcartooncharacter1934walt-disneywhite-duck-17015285464592qqyb.png" alt="" width="30" height="24" class="d-inline-block align-text-top">
+          RETI
+          <!-- <img scr="../../covidImage.PNG">
+          DUCK 
+            //không thấy served
+          -->
+        </a>
+
+        <!--CSS differentRainDrop.css-->
+        <!--JS differentRainDrop.js  //không xuất hiện overflow-y-->
+        <!--dòng div sau cũng không xuất hiện overflow-y -->
+        <div class="back-row-toggle splat-toggle">
+            <div class="rain front-row"></div>
+            <div class="rain back-row"></div>
+            <div class="toggles"> <!--3 bong bóng options-->
+                <div class="splat-toggle toggle active">SPLAT</div>
+                <div class="back-row-toggle toggle active">BACK<br>ROW</div>
+                <div class="single-toggle toggle">SINGLE</div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!--CUSTOMIZE THE PAGE USING EJS-->
+<!--website personalization-->
+<nav class="navbar navbar-inverse">
+    <div class="container-fluid">
+
+      <div class="navbar-header">
+        <a class="navbar-brand" href="#">P.E.T</a>
+      </div>
+
+      <ul class="nav navbar-nav">
+          <li class="active"><a href="/"><i class="fa fa-home fa-fw"></i>Home</a></li>
+
+          <li>
+            <div class="dropdown">
+                <!--trong index.ejs dùng role trong khúc dieu_huong.ejs và dùng message trong khúc main-->
+                <!--Dưới góc độ visitor,thì role là không đổi hardcoded là role="visitor", dành cho Khách tham quan, Admin chưa login, QLCN chưa login, Nhanvien chưa login-->
+                <!--Tuy nhiên khi các Admin, QLCN, Nhanvien đã login thành công và tới Home thì phải có Home specifc cho từng cá nhân đặc biệt là các menu options khác nhau-->
+                <!--ASM2_phan22 problem là khi các Admin,QLCN,Nhanvien đã login thành công thì role được truyền vào index.ejs hardcoded như "quanlychinhanh","admin","nhanvien" dẫn tới khi admin đã login và click Home thì gặp dropdown của visitor vì gọi endpoint "/" getIndex-->
+                <!--trong ASM2_phan23 sẽ giúp visitor >> getIndex >> role nhận giá trị trong session-->
+                <button class="dropbtn"> 👤<%= role  %>   <!--code của w3school css là Dropdown nói chung, nhưng EJS làm cụ thể với role-->
+                  <i class="fa fa-caret-down"></i>
+                </button>
+                <div class="dropdown-content">
+                  <a href="/admin/login?">Admin</a>
+                  <a href="/nhanvien/login?">Employee</a>
+                  <a href="/quanlychinhanh/login?">Branch manager</a>
+                </div>
+              </div> 
+          </li>
+
+          <% if (role === 'admin' && isLoggedIn ) { %>    <!--Kinh nghiệm, với = trong EJS tag thì biến đó là required; còn if thì not required-->
+            <li><a href="/admin/manageUsers">Manage Users</a></li>
+          <% } %>
+
+          <% if (role === 'nhanvien') { %>
+                <!-- <li><a href="#">Personal Profile</a></li> -->
+                <li><a href="/nhanvien/dangkynghiphep">Nghỉ phép</a></li>  
+                <li><a href="/nhanvien/manHinhNhapCovidNhanvien"> register Covid19 </a></li>
+                <li><a href="/nhanvien/tracuuCovidNhanvien"> Personal Covid19 </a></li>
+                <li><a href="/nhanvien/diemdanhvao"> CheckIn </a></li>
+                <li><a href="/nhanvien/diemdanhra"> CheckOut </a></li> <!--để truy cập trực tiếp thay vì phải checkin rồi save rồi checkout sẽ tạo rất nhiều phiếu dummy checkin trên CSDL-->
+                <li><a href="/nhanvien/daySummary"> Day Summary </a></li>
+          <% } %>
+
+          <% if ( (role === 'quanlychinhanh'  ) && isLoggedIn) { %>
+               <!--báo lỗi Invalid left-hand side in assignment chứng tỏ phải là === chứ không =-->
+               <li><a href="/quanlychinhanh/tracuuCovidQuanly"> 🦠 Covid19 </a></li>
+               <li><a href="/quanlychinhanh/thongtinCovidNhanvien"> 😷 Employee Covid19 </a></li>
+               <!-- <li><a href="/quanlychinhanh/kiemtragiolam"> ✍️ Employee attendance </a></li> -->
+          <% } %>   
+      
+        
+      </ul>
+
+      <!--role='visitor' không tham gia-->
+
+      <!--a href với nút Log in , Signup là để getLogin, getSignup-->
+
+      <!--Không thể ghi role === 'quanlychinhanh' || role=== 'Branch manager' để controller có thể truyền 'Branch manager', lý do là giá trị của biến role bắt buộc là 'quanlychinhanh' vì phụ thuộc rất chặt vào endpoint là app.use('/quanlychinhanh', quanlychinhanhRoutes);-->
+      <% if(role === 'admin' || role === 'nhanvien' || role === 'quanlychinhanh') { %>   <!--khi pass được điều kiện và đi vào trong thì bắt buộc phải có pageRegister,isLoggedIn,pageLogin -->
+          <ul class="nav navbar-nav navbar-right">
+
+            <!-- chưa login và không ở tại trang /admin/register thì nút Sign up visible-->
+            <!-- chưa login và đang ở trang /admin/register thì không có nút Sign up-->
+              <% if(!pageRegister && !isLoggedIn){  %>
+                  <li><a href="<%=`/${role}`%>/register"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
+              <% }  %>
+  
+              <!--nếu chưa login và đang ở trang form Login thì if(!false && !true) thành if(false) giúp hidden nút Login-->
+              <!--chưa login và đang ở trang form /admin/register khi đó GET /admin/register handler sẽ truyền tới pageLogin:false thì nút Login visible-->
+              <% if(!isLoggedIn && !pageLogin) {   %>
+                  <li><a href="<%=`/${role}`%>/login"><span class="glyphicon glyphicon-log-in"></span> Log In</a></li>
+              <%  } %>
+              
+              <!--!pageRegister && isLoggedIn thì không rõ ràng?-->
+              <% if(isLoggedIn){ %> 
+                    
+                    <li>
+                        <form action="<%=`/${role}`%>/logout" method="post">
+                            <button style="background-color: transparent; color: #9d9d9d ; margin-left:1.5rem ; border-style:none"  type="submit"><span class="glyphicon glyphicon-log-out"></span> Log Out </button>
+                        </form>
+                    </li>
+              <% }  %>  
+              
+          </ul>
+      <% } %>
+
+    </div>
+</nav>

@@ -1,0 +1,136 @@
+<%- include('../views/layouts/khuc_dau.ejs') %>
+<%- include('../views/layouts/header.ejs') %> 
+        <div class="container">
+            <h1 style="background-color: rgb(222 234 77); color: rgb(255,255,0);" class="index_title">Employee Check In</h1>
+
+            <%  if(Working===false){ %>
+                <div style="min-height:100%" class="index_main_section">
+                    <div style="text-align:center;" class="w3-container">
+                        <div class="w3-card-4" style="width:50%; margin-left:25%">
+                            <header class="w3-container w3-blue">
+                              <h2>💙Phiếu điểm danh</h2>
+                            </header>
+                            
+                            <div class="w3-container" style="background-color: rgb(119 184 226);">
+                              
+                                <span> 👉 Trạng thái hiện tại: <%=  Working? "Đang làm việc" : "Không làm việc"  %> </span> <!--toán tử 3 ngôi bắt buộc dùng = trong EJS tags-->
+                               
+                                <form id="DiemDanh" action="/nhanvien/diemdanhvao" method="POST">
+                                    <div class="row justify-content-center align-items-start" style="text-align: center">
+                                      <label for="EmpName" class="col" style="display:inline-block;
+                                      vertical-align: middle;
+                                      float: none;">Tên nhân viên:</label>
+                                      <input style="display:inline-block;
+                                      vertical-align: middle; text-align: center;
+                                      float: none;" class="col w3-blue" id="EmpName" class="form-control" type="text" name="ten" value="<%= ten_nhan_vien  %>" aria-label="readonly input example" readonly>
+                                    </div>
+                                      
+                                    <div class="row justify-content-center" style="text-align: center">
+                                      <label for="EmpWorkplace" class="col" style="display:inline-block;
+                                      vertical-align: middle; text-align: center;
+                                      float: none;">Nơi làm việc:</label>
+                                      <select style="display:inline-block;
+                                      vertical-align: middle;
+                                      float: none;" class="col w3-green" name="noilamviec" id="EmpWorkplace" class="form-select" aria-label="Default select example">
+                                        <option value="Cty" selected>Công ty</option>
+                                        <option value="Nha">Nhà</option>
+                                        <option value="KH">Khách hàng</option>
+                                      </select>
+                                    </div>
+                                  
+                                    <div class="row justify-content-center" style="text-align: center">
+                                        <label for="EmpStartTime" class="col" style="display:inline-block;
+                                        vertical-align: middle;
+                                        float: none;">Giờ bắt đầu làm việc:</label>
+                                        <input name="datetimeCheckIn" style="display:inline-block;
+                                        vertical-align: middle; text-align: center;
+                                        float: none;" class="col w3-blue"  id="EmpStartTime" class="form-control" type="text" 
+                                        value="<%= ngay_thang_nam_lam_viec , %> , <%= gio_bat_dau_lam_viec%> : <%= phut_bat_dau_lam_viec %> : <%=  giay_bat_dau_lam_viec %> <%=  pm_or_am %>" aria-label="readonly input example" readonly>
+                                    </div>
+                                    
+                                    <br>
+                                    <div class="row justify-content-center" style="text-align: center">
+                                      <!--button với type button không đi được-->
+                                      <button style="font-family:Calistoga"  type="submit" class="btn btn-success"> 👉 Lưu vào CSDL</button>
+                                    </div> 
+                                    <br>
+                                </form>
+                                <%- ChuoiHTMLcontactus  %>
+                              </div>
+                              <footer class="w3-container w3-blue">
+                                <h5>WELCOME TO WORK! 😎</h5>
+                              </footer>
+                        </div>
+                              <!--footer có thể ở chỗ này để tạo khác biệt-->
+                        
+                    </div>
+                </div>
+            <%  } %>
+            
+            <%  if(Working===true){ %>
+                <div style="min-height:100%" class="index_main_section">
+                  <div style="text-align:center;" class="w3-container">
+                      <div class="w3-card-4" style="width:50%; margin-left:25%">
+                          <header class="w3-container w3-red">
+                            <h2>❤️ Đã lưu kết quả điểm danh</h2>
+                          </header>
+                          
+                          <div class="w3-container" style="background-color: rgb(119 184 226);">
+                            
+                              <span> 👉 Trạng thái hiện tại: <%=  Working? "Đang làm việc" : "Không làm việc"  %> </span> <!--toán tử 3 ngôi bắt buộc dùng = trong EJS tags-->
+                             
+                              <form id="DiemDanh" action="/nhanvien/diemdanhvao" method="POST">
+                                  <div class="row justify-content-center" style="text-align: center">
+                                    <label for="EmpName" class="col" style="display:inline-block;
+                                    vertical-align: middle;
+                                    float: none;">Tên nhân viên:</label>
+                                    <input style="display:inline-block;
+                                    vertical-align: middle; text-align: center;
+                                    float: none;" class="col w3-blue" id="EmpName" class="form-control" type="text" name="ten" value="<%= MongoDB_ten_nhan_vien  %>" aria-label="readonly input example" readonly>
+                                  </div>
+
+                                  <div class="row justify-content-center" style="text-align: center">
+                                    <label for="EmpWorkplace" class="col" style="display:inline-block;
+                                    vertical-align: middle;
+                                    float: none;">Nơi làm việc:</label>
+                                    <input style="display:inline-block;
+                                    vertical-align: middle; text-align: center;
+                                    float: none;" class="col w3-blue" id="EmpWorkplace" class="form-control" type="text" name="noilamviec" value="<%= MongoDB_noilamviec %>" placeholder"%>" aria-label="readonly input example" readonly>
+                                  </div>
+                                    
+                                  <div class="row justify-content-center" style="text-align: center">
+                                      <label for="EmpStartTime" class="col" style="display:inline-block;
+                                      vertical-align: middle;
+                                      float: none;">Giờ bắt đầu làm việc:</label>
+                                      <input name="datetimeCheckIn" style="display:inline-block;
+                                      vertical-align: middle; text-align: center;
+                                      float: none;" class="col w3-blue"  id="EmpStartTime" class="form-control" type="text" 
+                                      value="<%=  MongoDB_datetimestring %>" aria-label="readonly input example" readonly>
+                                  </div>
+                                  
+                                  <br>
+                                  <div class="row justify-content-center" style="text-align: center">
+                                    <!--để disable một button thì dùng type="button" không cần javascript, để trình diễn-->
+                                    <button type="button" style="font-family:Calistoga"  class="btn btn-success"> Đã Lưu 🍺🎉</button>
+                                  </div> 
+                                  <br>
+                                  <div>
+                                      <a href="/nhanvien/diemdanhra"> 🆒 Check out</a>
+                                  </div>
+                                  <br>
+                              </form>
+                            </div>
+                            <%- ChuoiHTMLcontactusDangLamViec  %>
+                            <footer class="w3-container w3-red">
+                              <h5> THERE IS A GOOD WORKING RELATIONSHIP BETWEEN THE DEPARTMENTS! 🤝 </h5>
+                            </footer>
+                      </div>
+                            <!--footer có thể ở chỗ này để tạo khác biệt-->
+                      
+                  </div>
+                </div>
+            <%  } %>
+        </div>
+        
+        
+<%- include('../views/layouts/khuc_cuoi.ejs') %>

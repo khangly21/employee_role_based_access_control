@@ -1,0 +1,22 @@
+<%- include('../views/layouts/khuc_dau.ejs') %>
+<%- include('../views/layouts/header.ejs') %> 
+        <div class="container"> <!--https://www.w3schools.com/bootstrap/bootstrap_grid_examples.asp-->
+                <h1 style="background-color: rgb(222 234 77); color: rgb(255,255,0);" class="index_title">User management</h1>
+                <!--Resize the browser window to see the effect -->
+                <!--The columns will automatically stack on top of each other when the screen is less than 768px wide -->
+                <div class="row" style="text-align:center">
+                    <div class="col-6 col-sm-6 w3-text-blue" style="background-color:lavender;">
+                        <!--dynamic HTML-->
+                        <%- Chuoi_HTML_add_employee_into_database  %>
+                    </div>
+
+                    <div class="col-6 col-sm-6 w3-text-pink" style="background-color:lavenderblush;">
+                        <%- Chuoi_HTML_add_QLCN_into_database %>
+                    </div>
+                </div>
+        </div>
+
+        <div><%- HTMLobject %> </div>   <!--nhận chuỗi HTML bằng = hay nothing đều fail-->
+        
+
+<%- include('../views/layouts/khuc_cuoi.ejs') %>

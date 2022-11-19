@@ -1,0 +1,40 @@
+/*https://stackoverflow.com/questions/19192211/css-how-to-style-a-footer*/
+
+/*http://localhost:3002/css/footer.css*/
+
+/*chỉ nên để màu sắc ,... . Còn kích thước thường tính toán có liên quan nhau nên ở main.css*/
+
+/*for ALL screen*/
+footer{
+    color: yellow !important;  /*bắt buộc ưu tiên hơn các color sẵn có của bootstrap 5*/
+    background-color:rgb(34,34,34);
+
+}
+
+#footer_content{
+    /* padding:50px 10px;  không responsive */
+    padding:20% 10px;
+}
+
+
+/*Responsive Web Design - Media Queries*/
+/*https://stackoverflow.com/questions/21075983/how-to-use-particular-css-styles-based-on-screen-size-device*/
+/*https://www.w3schools.com/cssref/css3_pr_mediaquery.asp*/
+
+/*https://stackoverflow.com/questions/20242455/what-are-the-difference-between-col-lg-and-col-md-in-bootstrap3*/
+/*nếu dùng min-width: 768px là từ màn hình tablet trở lên, VD Nest Hub trở lên sẽ visibility: visible;  đồng nghĩa với các màn hình nhỏ như mobile Samsung Galaxy (width 412 px)nhỏ xuống iphone4 (width 320px)  sẽ visibility: hidden;*/
+@media (min-width: 768px) {
+    hr.footer_hr {
+        /*visible trong mobile, nhưng invisible trong tablet tới desktop*/
+        visibility: hidden;
+    }
+}
+
+/* responsive, form small screens, show hr */
+@media (max-width: 479px) {
+    hr.footer_hr {
+        /*visible trong mobile, nhưng invisible trong tablet tới desktop*/
+        visibility: visible;
+    }
+    
+}
